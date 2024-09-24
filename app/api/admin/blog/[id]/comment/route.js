@@ -1,5 +1,5 @@
-import dbConnect from '../../../../../../../lib/db'; // Correct path
-import Blog from '../../../../../../../models/Blog'; // Correct path to the Blog model
+import dbConnect from '../../../../../../lib/db'; // Correct path
+import Blog from '../../../../../../models/Blog'; // Correct path to the Blog model
 import { NextResponse } from 'next/server';
 
 export async function POST(request, { params }) {
