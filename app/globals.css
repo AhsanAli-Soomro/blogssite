@@ -2,26 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+.container {
+  @apply px-4 md:px-8 lg:px-12 xl:px-20;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  @apply bg-white text-gray-900;
+  /* Default light mode */
 }
 
+html.dark {
+  @apply bg-gray-900 text-gray-100;
+  /* Dark mode background and text color */
+}
+
+/* Example component styles for dark mode */
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply transition-colors duration-300 ease-in-out;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+a {
+  @apply text-blue-600 dark:text-blue-400;
+  /* Change link color in dark mode */
 }
+
+/* button {
+  @apply bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white;
+} */
