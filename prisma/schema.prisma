@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,7 +14,7 @@ model Blog {
   image    String?
   likes    Int      @default(0)
   likedBy  String[]
-  comments Comment[]
+  comments Comment[]  // Relation to Comment
 }
 
 model Comment {
@@ -29,21 +23,27 @@ model Comment {
   email    String
   comment  String
   likes    Int      @default(0)
-  replies  Reply[]
+  replies  Reply[]  // Relation to Reply
+  blog     Blog?    @relation(fields: [blogId], references: [id]) // Relation to Blog
+  blogId   String?  // Foreign key to Blog
+  user     User?    @relation(fields: [userId], references: [id], name: "UserToComment") // Relation to User with unique relation name
+  userId   String?  // Foreign key to User
 }
 
 model Reply {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  email    String
-  comment  String
-  likes    Int      @default(0)
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String
+  replyContent  String  // Changed to avoid naming conflicts
+  likes         Int      @default(0)
+  comment       Comment? @relation(fields: [commentId], references: [id]) // Relation to Comment
+  commentId     String?  // Foreign key to Comment
 }
 
 model User {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   name     String
   email    String   @unique
-  likes    String[]
-  comments Comment[]
+  likes    String[] // List of liked blog post IDs or similar
+  comments Comment[] @relation("UserToComments") // Relation to Comment with unique relation name
 }

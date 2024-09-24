@@ -1,24 +1,52 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { NextResponse } from 'next/server';
+import dbConnect from '../../../../lib/db';
+import Blog from '../../../../models/Blog';
+import fs from 'fs';
+import path from 'path';
 
-export async function GET() {
-  try {
-    const blogs = await prisma.blog.findMany();
-    return NextResponse.json(blogs, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Error fetching blogs' }, { status: 500 });
-  }
-}
-
+// Handle POST request to create a new blog post with a Base64 image
 export async function POST(request) {
+  await dbConnect();
   const { title, content, image } = await request.json();
 
   try {
-    const newBlog = await prisma.blog.create({
-      data: { title, content, image },
+    let imageUrl = null;
+
+    // Check if there's a Base64 image string
+    if (image) {
+      const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+      const fileName = `blog_${Date.now()}.png`;
+      const filePath = path.join(process.cwd(), 'public/uploads', fileName);
+
+      if (!fs.existsSync(path.join(process.cwd(), 'public/uploads'))) {
+        fs.mkdirSync(path.join(process.cwd(), 'public/uploads'), { recursive: true });
+      }
+
+      fs.writeFileSync(filePath, buffer);
+      imageUrl = `/uploads/${fileName}`;
+    }
+
+    const newBlog = new Blog({
+      title,
+      content,
+      image: imageUrl,
     });
-    return NextResponse.json(newBlog, { status: 201 });
+    await newBlog.save();
+
+    return NextResponse.json({ message: 'Blog post created successfully!' }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Error creating blog' }, { status: 500 });
+    return NextResponse.json({ message: 'Error creating blog post', error: error.message }, { status: 500 });
+  }
+}
+
+// Handle GET request to list blog posts
+export async function GET() {
+  await dbConnect();
+  try {
+    const blogs = await Blog.find({});
+    return NextResponse.json({ blogs }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ message: 'Error fetching blogs', error: error.message }, { status: 500 });
   }
 }

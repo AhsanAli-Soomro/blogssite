@@ -2,36 +2,27 @@ import mongoose from 'mongoose';
 
 const commentSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true }, // New email field for comments
-  comment: { type: String, required: true }
+  email: { type: String, required: true },
+  comment: { type: String, required: true },
+  likes: { type: Number, default: 0 },
+  replies: [
+    {
+      name: String,
+      email: String,
+      replyContent: String,
+      likes: { type: Number, default: 0 },
+    },
+  ],
 });
 
-const BlogSchema = new mongoose.Schema({
+const blogSchema = new mongoose.Schema({
   title: String,
   content: String,
   image: String,
   likes: { type: Number, default: 0 },
-  likedBy: { type: [String], default: [] },
-  comments: [
-    {
-      name: String,
-      comment: String,
-      email: String,
-      likes: { type: Number, default: 0 },
-      replies: [
-        {
-          name: String,
-          comment: String,
-          email: String,
-          likes: { type: Number, default: 0 },
-        }
-      ]
-    }
-  ],
+  likedBy: [String], // Storing emails of users who liked the post
+  comments: [commentSchema],
 });
 
-// Correcting the Blog Schema export
-const Blog = mongoose.models.Blog || mongoose.model('Blog', BlogSchema);
-
+const Blog = mongoose.models.Blog || mongoose.model('Blog', blogSchema);
 export default Blog;
-
