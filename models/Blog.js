@@ -11,18 +11,27 @@ const BlogSchema = new mongoose.Schema({
   content: String,
   image: String,
   likes: { type: Number, default: 0 },
-  likedBy: { type: [String], default: [] }, // Stores emails of users who liked the post
+  likedBy: { type: [String], default: [] },
   comments: [
     {
       name: String,
       comment: String,
       email: String,
       likes: { type: Number, default: 0 },
-    },
+      replies: [
+        {
+          name: String,
+          comment: String,
+          email: String,
+          likes: { type: Number, default: 0 },
+        }
+      ]
+    }
   ],
 });
 
-
-const Blog = mongoose.models.Blog || mongoose.model('Blog', blogSchema);
+// Correcting the Blog Schema export
+const Blog = mongoose.models.Blog || mongoose.model('Blog', BlogSchema);
 
 export default Blog;
+

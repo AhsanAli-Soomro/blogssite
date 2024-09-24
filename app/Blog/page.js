@@ -8,23 +8,23 @@ const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
-    // Fetching the blog data from the API
-    const fetchBlogs = async () => {
+    const fetchBlog = async () => {
       try {
-        const res = await fetch('/api/admin/blog');
+        const res = await fetch(`/api/admin/blog/${id}`);
         if (res.ok) {
           const data = await res.json();
-          setBlogs(data.blogs);
+          setBlog(data);
         } else {
-          console.error('Failed to fetch blogs');
+          setMessage('Error fetching blog details');
         }
       } catch (error) {
-        console.error('Error fetching blogs:', error);
+        setMessage('Error fetching blog');
       }
     };
-
-    fetchBlogs();
-  }, []);
+  
+    fetchBlog();
+  }, [id]);
+  
 
   return (
     <div className="container mx-auto p-4 flex flex-col lg:flex-row">

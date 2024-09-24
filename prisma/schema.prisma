@@ -12,3 +12,47 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URI")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Blog {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  content  String
+  image    String?
+  likes    Int      @default(0)
+  likedBy  String[]
+  comments Comment[]
+}
+
+model Comment {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String
+  comment  String
+  likes    Int      @default(0)
+  replies  Reply[]
+}
+
+model Reply {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String
+  comment  String
+  likes    Int      @default(0)
+}
+
+model User {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String   @unique
+  likes    String[]
+  comments Comment[]
+}
