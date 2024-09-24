@@ -11,10 +11,12 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.9.1",
     "@clerk/nextjs": "^5.6.0",
+    "@prisma/client": "^5.19.1",
     "express": "^4.21.0",
     "formidable": "^3.5.1",
     "mongoose": "^8.6.3",
     "next": "14.2.13",
+    "prisma": "^5.19.1",
     "quill": "^2.0.2",
     "react": "^18",
     "react-dom": "^18",
