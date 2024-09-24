@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../../../../lib/db';
 import Blog from '../../../../../models/Blog';
-import fs from 'fs';
-import path from 'path';
 
 // Handle PUT request to update a blog by ID
 export async function PUT(request, { params }) {
@@ -16,31 +14,9 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
     }
 
-    // Check if a new image is uploaded (Base64 string) or if we are keeping the existing image
-    let imageUrl = blog.image;
-    if (image && image.startsWith('data:image')) {
-      // A new image has been uploaded, so replace the old image
-      const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
-      const buffer = Buffer.from(base64Data, 'base64');
-      const fileName = `blog_${Date.now()}.png`; // Generate a unique file name
-      const filePath = path.join(process.cwd(), 'public/uploads', fileName);
-
-      // Ensure the uploads directory exists
-      if (!fs.existsSync(path.join(process.cwd(), 'public/uploads'))) {
-        fs.mkdirSync(path.join(process.cwd(), 'public/uploads'), { recursive: true });
-      }
-
-      // Save the new image file to disk
-      fs.writeFileSync(filePath, buffer);
-
-      // Update the image URL
-      imageUrl = `/uploads/${fileName}`;
-    }
-
-    // Update the blog fields
-    blog.title = title;
-    blog.content = content;
-    blog.image = imageUrl; // Use the new image URL or keep the existing one
+    blog.title = title || blog.title;
+    blog.content = content || blog.content;
+    blog.image = image || blog.image;
 
     await blog.save();
 
@@ -50,8 +26,6 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ message: 'Error updating blog', error: error.message }, { status: 500 });
   }
 }
-
-
 
 // Handle DELETE request to delete a blog by ID
 export async function DELETE(request, { params }) {
@@ -69,7 +43,6 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({ message: 'Error deleting blog', error: error.message }, { status: 500 });
   }
 }
-
 
 // Handle GET request to fetch a blog by ID
 export async function GET(request, { params }) {
