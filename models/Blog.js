@@ -6,16 +6,22 @@ const commentSchema = new mongoose.Schema({
   comment: { type: String, required: true }
 });
 
-const blogSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  content: { type: String, required: true },
-  likes: {type: Number,default: 0,},
-  likedBy: {type: [String],default: [],},
-  image: { type: String },
+const BlogSchema = new mongoose.Schema({
+  title: String,
+  content: String,
+  image: String,
   likes: { type: Number, default: 0 },
-  likedBy: { type: [String], default: [] }, // Array of emails for tracking likes
-  comments: [commentSchema] // Embedded comments schema
+  likedBy: { type: [String], default: [] }, // Stores emails of users who liked the post
+  comments: [
+    {
+      name: String,
+      comment: String,
+      email: String,
+      likes: { type: Number, default: 0 },
+    },
+  ],
 });
+
 
 const Blog = mongoose.models.Blog || mongoose.model('Blog', blogSchema);
 
