@@ -42,32 +42,16 @@ const AdminPage = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
-
+  
     reader.onloadend = () => {
-      setImage(reader.result);
+      setImage(reader.result); // Set the Base64 string for uploading to Cloudinary
     };
-    const handleDelete = async (id) => {
-      try {
-        const response = await fetch(`/api/admin/blog/${id}`, { method: 'DELETE' });
-
-        if (response.ok) {
-          setMessage('Blog deleted successfully!');
-          setBlogs(blogs.filter((blog) => blog._id !== id)); // Remove the deleted blog from the state
-        } else {
-          const result = await response.json();
-          setMessage(`Error: ${result.message}`);
-        }
-      } catch (error) {
-        console.error('Error deleting blog:', error);
-        setMessage('Error deleting blog');
-      }
-    };
-
-
+  
     if (file) {
       reader.readAsDataURL(file);
     }
   };
+  
 
   const submitBlog = async (e) => {
     e.preventDefault();
