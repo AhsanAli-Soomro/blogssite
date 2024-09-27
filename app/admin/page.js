@@ -2,16 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css'; // Import Quill styles
-
-// Dynamically load ReactQuill to ensure it only runs on the client
+import 'react-quill/dist/quill.snow.css';
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 const AdminPage = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [image, setImage] = useState(null); // Image as base64 or existing image URL
-  const [existingImage, setExistingImage] = useState(null); // Store the existing image URL
+  const [image, setImage] = useState(null);
+  const [existingImage, setExistingImage] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [message, setMessage] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +17,7 @@ const AdminPage = () => {
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const adminPassword = 'admin123'; // Use a more secure password in production
+  const adminPassword = 'admin123';
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -41,18 +39,17 @@ const AdminPage = () => {
     }
   };
 
-  // Convert image to base64
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
 
     reader.onloadend = () => {
-      setImage(reader.result); // Set base64 image string
+      setImage(reader.result);
     };
     const handleDelete = async (id) => {
       try {
         const response = await fetch(`/api/admin/blog/${id}`, { method: 'DELETE' });
-        
+
         if (response.ok) {
           setMessage('Blog deleted successfully!');
           setBlogs(blogs.filter((blog) => blog._id !== id)); // Remove the deleted blog from the state
@@ -65,7 +62,7 @@ const AdminPage = () => {
         setMessage('Error deleting blog');
       }
     };
-    
+
 
     if (file) {
       reader.readAsDataURL(file);
@@ -74,10 +71,10 @@ const AdminPage = () => {
 
   const submitBlog = async (e) => {
     e.preventDefault();
-  
+
     const method = editMode ? 'PUT' : 'POST';
     const apiUrl = editMode ? `/api/admin/blog/${editId}` : '/api/admin/blog';
-  
+
     try {
       const response = await fetch(apiUrl, {
         method: method,
@@ -90,9 +87,9 @@ const AdminPage = () => {
           image: image ? image : existingImage, // Send the new image if it exists, otherwise send the existing one
         }),
       });
-  
+
       const result = await response.json();
-  
+
       if (response.ok) {
         setMessage(editMode ? 'Blog updated successfully!' : 'Blog created successfully!');
         setTitle('');
@@ -101,7 +98,7 @@ const AdminPage = () => {
         setExistingImage(null); // Clear existing image after update
         setEditMode(false);
         setEditId(null);
-  
+
         // Fetch updated blogs after successful submission
         const updatedBlogs = await fetch('/api/admin/blog');
         const updatedData = await updatedBlogs.json();
@@ -114,7 +111,7 @@ const AdminPage = () => {
       setMessage('Error submitting the blog');
     }
   };
-  
+
 
   const handleDelete = async (id) => {
     const response = await fetch(`/api/admin/blog/${id}`, { method: 'DELETE' });
@@ -186,27 +183,38 @@ const AdminPage = () => {
           </form>
 
           <h2 className="text-2xl font-bold mt-8">All Blogs</h2>
-          <div>
-            {blogs.map((blog) => (
-              <div key={blog._id} className="border p-4 mt-4">
-                <h3 className="font-bold">{blog.title}</h3>
-                {blog.image && <img src={blog.image} alt={blog.title} className="w-full h-48 object-cover mb-4" />}
-                <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-                <button
-                  className="bg-yellow-500 text-white px-4 py-2 mt-2"
-                  onClick={() => handleEdit(blog)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="bg-red-500 text-white px-4 py-2 mt-2 ml-2"
-                  onClick={() => handleDelete(blog._id)}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
+          <div className="container mx-auto p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {blogs.map((blog) => (
+                <div key={blog._id} className="border p-4 mt-4 rounded-lg shadow-lg bg-white">
+                  <h3 className="font-bold">{blog.title}</h3>
+                  {blog.image && (
+                    <img src={blog.image} alt={blog.title} className="w-full h-48 object-cover mb-4 rounded-md" />
+                  )}
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: blog.content.length > 100 ? `${blog.content.substring(0, 50)}...` : blog.content,
+                    }}
+                  />
+                  <div className="flex justify-between mt-4">
+                    <button
+                      className="bg-yellow-500 text-white px-4 py-2 rounded"
+                      onClick={() => handleEdit(blog)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-4 py-2 rounded ml-2"
+                      onClick={() => handleDelete(blog._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+
         </>
       ) : (
         <>

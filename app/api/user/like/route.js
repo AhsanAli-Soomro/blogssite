@@ -3,12 +3,10 @@ import connectDB from '../../../../lib/db';
 import User from '../../../../models/User';
 
 export async function POST(req) {
-  await connectDB(); // Ensure connection to the database
+  await connectDB();
 
   try {
-    const { email, blogId } = await req.json(); // Get email and liked blog post ID from request body
-
-    // Check if user exists
+    const { email, blogId } = await req.json();
     let user = await User.findOne({ email });
 
     if (!user) {

@@ -20,17 +20,12 @@ const Blogs = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {blogs.map((blog) => (
                         <div key={blog._id} className="border p-4 rounded-lg shadow-lg bg-white">
-                            {/* Display image */}
                             {blog.image && (
                                 <img src={blog.image} alt={blog.title} className="w-full h-48 object-cover rounded-lg mb-4" />
                             )}
-
-                            {/* Blog Title */}
                             <Link href={`/Blog/${blog._id}`}>
                                 <h2 className="text-2xl font-bold mb-2 cursor-pointer hover:underline">{blog.title}</h2>
                             </Link>
-
-                            {/* Blog Content - Render HTML */}
                             <div
                                 className="text-gray-600 mb-4"
                                 dangerouslySetInnerHTML={{
@@ -40,8 +35,6 @@ const Blogs = () => {
                                             : blog.content,
                                 }}
                             ></div>
-
-                            {/* Blog Footer (Likes and Comments) */}
                             <div className="flex justify-between items-center text-gray-600">
                                 <span>{blog.likes} Likes</span>
                                 <span>{blog.comments?.length || 0} Comments</span>

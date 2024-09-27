@@ -7,7 +7,7 @@ import path from 'path';
 // Handle POST request to create a new blog post with a Base64 image
 export async function POST(request) {
   await dbConnect();
-  const { title, content, image } = await request.json();
+  const { title, content, image, likes } = await request.json();
 
   try {
     let imageUrl = null;
@@ -31,6 +31,7 @@ export async function POST(request) {
       title,
       content,
       image: imageUrl,
+      likes,
     });
     await newBlog.save();
 

@@ -50,10 +50,16 @@ export async function GET(request, { params }) {
   const { id } = params;
 
   try {
-    const blog = await Blog.findById(id);
+    // Find the blog post and populate the comments field with full details
+    const blog = await Blog.findById(id).populate({
+      path: 'comments',  // Populate the 'comments' field
+      select: 'content author createdAt'  // Specify the fields you want to return from the Comment model
+    });
+
     if (!blog) {
       return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
     }
+
     return NextResponse.json(blog, { status: 200 });
   } catch (error) {
     console.error('Error fetching blog:', error);

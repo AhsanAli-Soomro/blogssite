@@ -11,9 +11,10 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.9.1",
     "@clerk/nextjs": "^5.6.0",
+    "body-parser": "^1.20.3",
+    "date-fns": "^4.1.0",
     "express": "^4.21.0",
-    "formidable": "^3.5.1",
-    "mongoose": "^8.6.3",
+    "mongoose": "^8.6.4",
     "next": "14.2.13",
     "quill": "^2.0.2",
     "react": "^18",

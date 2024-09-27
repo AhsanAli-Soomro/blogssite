@@ -1,26 +1,68 @@
-import dbConnect from '../../../../../../lib/db'; // Correct path
-import Blog from '../../../../../../models/Blog'; // Correct path to the Blog model
 import { NextResponse } from 'next/server';
+import connectMongo from '../../../../../../lib/db';
+import BlogPost from '../../../../../../models/Blog';
+import Comment from '../../../../../../models/Comment';
 
-export async function POST(request, { params }) {
-  await dbConnect();
-  const { id } = params; // Extracting blog ID from params
-  const { name, email, comment } = await request.json(); // Extracting the comment data
-
+// POST method to add a comment to a blog post
+export async function POST(req, { params }) {
   try {
-    // Find the blog by ID
-    const blog = await Blog.findById(id);
-    if (!blog) {
-      return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
+    const { id } = params;
+    const { content, author } = await req.json(); // Receive author and content
+
+    // Connect to MongoDB
+    await connectMongo();
+
+    // Find the corresponding blog post
+    const post = await BlogPost.findById(id);
+    if (!post) {
+      return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
 
-    // Add the new comment to the blog's comments array
-    blog.comments.push({ name, email, comment });
-    const updatedBlog = await blog.save(); // Save the blog with the new comment
+    // Create a new comment
+    const newComment = new Comment({
+      content,
+      author, // Save the author information
+      createdAt: Date.now(),
+    });
 
-    return NextResponse.json({ message: 'Comment added successfully!', updatedBlog }, { status: 200 });
+    // Save the comment
+    const savedComment = await newComment.save();
+
+    // Add the comment to the blog post's comments array
+    post.comments.push(savedComment._id);
+    await post.save();
+
+    // Return the newly saved comment
+    return NextResponse.json(savedComment, { status: 201 });
   } catch (error) {
-    console.error('Error adding comment:', error);
-    return NextResponse.json({ message: 'Error adding comment', error: error.message }, { status: 500 });
+    console.error(error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+// GET method to fetch comments for a blog post
+export async function GET(req, { params }) {
+    try {
+      const { id } = params;
+  
+      // Connect to MongoDB
+      await connectMongo();
+  
+      // Find the corresponding blog post and populate the comments
+      const post = await BlogPost.findById(id).populate({
+        path: 'comments',
+        select: 'content author createdAt' // Make sure to fetch content, author, and createdAt
+      });
+  
+      if (!post) {
+        return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+      }
+  
+      // Return the populated comments
+      return NextResponse.json(post.comments, { status: 200 });
+    } catch (error) {
+      console.error(error);
+      return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    }
+  }
+  
