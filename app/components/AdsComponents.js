@@ -2,7 +2,7 @@ import React from 'react'
 
 const AdsSection = () => {
   return (
-    <div className="lg:w-1/3 lg:pl-8 hidden lg:block">
+    <div className="lg:w-1/4 lg:pl-8 hidden lg:block">
       <div className="sticky top-20 p-4">
         <h3 className="text-xl font-bold mb-4">Sponsored Ads</h3>
         <div className="bg-gray-100 border rounded-lg p-4 mb-6">

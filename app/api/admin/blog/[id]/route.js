@@ -45,40 +45,24 @@ export async function DELETE(request, { params }) {
 }
 
 // Handle GET request to fetch a blog by ID
-// export async function GET(request, { params }) {
-//   await dbConnect();
-//   const { id } = params;
-
-//   try {
-//     // Find the blog post and populate the comments field with full details
-//     const blog = await Blog.findById(id).populate({
-//       path: 'comments',  // Populate the 'comments' field
-//       select: 'content author createdAt'  // Specify the fields you want to return from the Comment model
-//     });
-
-//     if (!blog) {
-//       return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
-//     }
-
-//     return NextResponse.json(blog, { status: 200 });
-//   } catch (error) {
-//     console.error('Error fetching blog:', error);
-//     return NextResponse.json({ message: 'Error fetching blog', error: error.message }, { status: 500 });
-//   }
-// }
-export async function GET(req, { params }) {
+export async function GET(request, { params }) {
   await dbConnect();
-
   const { id } = params;
 
   try {
-    const blog = await Blog.findById(id).populate('comments').lean();
+    // Find the blog post and populate the comments field with full details
+    const blog = await Blog.findById(id).populate({
+      path: 'comments',  // Populate the 'comments' field
+      select: 'content author createdAt'  // Specify the fields you want to return from the Comment model
+    });
+
     if (!blog) {
-      return new Response(JSON.stringify({ error: 'Blog not found' }), { status: 404 });
+      return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
     }
-    
-    return new Response(JSON.stringify(blog), { status: 200 });
+
+    return NextResponse.json(blog, { status: 200 });
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to fetch blog' }), { status: 500 });
+    console.error('Error fetching blog:', error);
+    return NextResponse.json({ message: 'Error fetching blog', error: error.message }, { status: 500 });
   }
 }

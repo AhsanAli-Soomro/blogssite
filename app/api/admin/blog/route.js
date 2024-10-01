@@ -10,9 +10,10 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Handle blog creation (POST request)
 export async function POST(request) {
   await dbConnect();
-  const { title, content, image } = await request.json();
+  const { title, content, image, category } = await request.json(); // Include category
 
   try {
     let imageUrl = null;
@@ -23,18 +24,18 @@ export async function POST(request) {
         folder: 'blogs',
         resource_type: 'image',
       });
-      imageUrl = result.secure_url; // The URL to the image on Cloudinary
+      imageUrl = result.secure_url;
     }
 
-    // Save the blog post with the image URL
+    // Create the blog post with the category reference
     const newBlog = new Blog({
       title,
       content,
-      image: imageUrl, // Save the Cloudinary URL to MongoDB
+      image: imageUrl,
+      category, // Associate the category
     });
 
     await newBlog.save();
-
     return NextResponse.json({ message: 'Blog post created successfully!' }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ message: 'Error creating blog post', error: error.message }, { status: 500 });
@@ -42,7 +43,7 @@ export async function POST(request) {
 }
 
 
-
+// Handle blog updates (PUT request)
 export async function PUT(request, { params }) {
   await dbConnect();
   const { id } = params;
@@ -55,8 +56,16 @@ export async function PUT(request, { params }) {
     }
 
     let imageUrl = blog.image; // Use existing image by default
+
+    // If a new image is provided, upload it to Cloudinary and delete the old one
     if (image && image !== blog.image) {
-      // If a new image is provided, upload it to Cloudinary
+      // Delete the old image from Cloudinary (optional but recommended)
+      if (blog.image) {
+        const publicId = blog.image.split('/').pop().split('.')[0];
+        await cloudinary.v2.uploader.destroy(`blogs/${publicId}`);
+      }
+
+      // Upload new image
       const result = await cloudinary.v2.uploader.upload(image, {
         folder: 'blogs',
         resource_type: 'image',
@@ -64,9 +73,11 @@ export async function PUT(request, { params }) {
       imageUrl = result.secure_url; // Update the image URL
     }
 
+    // Update blog details
     blog.title = title || blog.title;
     blog.content = content || blog.content;
     blog.image = imageUrl; // Save the updated image URL in MongoDB
+    // blog.category = category || blog.category
 
     await blog.save();
 
@@ -76,39 +87,33 @@ export async function PUT(request, { params }) {
   }
 }
 
-
-// Handle GET request to list blog posts
+// Handle GET request for listing blog posts with pagination
 export async function GET(req) {
   await dbConnect();
   
-  // Parse query params for pagination (e.g., page and limit)
+  // Parse query params for pagination (e.g., page, limit, category)
   const { searchParams } = new URL(req.url);
   const page = parseInt(searchParams.get('page')) || 1; // Default to page 1
   const limit = parseInt(searchParams.get('limit')) || 10; // Default to 10 posts per page
+  const category = searchParams.get('category'); // Optional category filter
 
   try {
-    const blogs = await Blog.find()
-      .select('title content image')
+    const filter = category ? { category } : {}; // Filter by category if provided
+    const blogs = await Blog.find(filter)
+    .populate('comments', '_id name')   
+    .populate('category', 'name') 
+    .select('title content comment category image')
+
       .skip((page - 1) * limit)
       .limit(limit)
       .lean();
-      
+
     // Get the total count of blogs for pagination metadata
-    const count = await Blog.countDocuments();
+    const count = await Blog.countDocuments(filter);
     
     return new Response(JSON.stringify({ blogs, totalPages: Math.ceil(count / limit) }), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ error: 'Failed to fetch blogs' }), { status: 500 });
   }
 }
-
-// export async function GET() {
-//   await dbConnect();
-//   try {
-//     const blogs = await Blog.find({}); // This will include the 'image' field by default
-//     return NextResponse.json({ blogs }, { status: 200 });
-//   } catch (error) {
-//     return NextResponse.json({ message: 'Error fetching blogs', error: error.message }, { status: 500 });
-//   }
-// }
 

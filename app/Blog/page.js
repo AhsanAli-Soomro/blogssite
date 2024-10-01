@@ -3,50 +3,93 @@
 import { useEffect, useState } from 'react';
 import AdsSection from '../components/AdsComponents';
 import RandomBlogsSection from '../components/RandomBlogsSection';
+import RecentBlogsSection from '../components/RecentBlogsSection';
 import Link from 'next/link';
 
 const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);  // New state to handle loading
-  const [error, setError] = useState(null);      // New state to handle errors
+  const [categories, setCategories] = useState([]); // State for categories
+  const [selectedCategory, setSelectedCategory] = useState(''); // State for selected category
+  const [loading, setLoading] = useState(true);  // State to handle loading
+  const [error, setError] = useState(null);      // State to handle errors
 
+  // Fetch blogs
   useEffect(() => {
     const fetchBlogs = async () => {
-      setLoading(true);  // Set loading to true when fetching starts
-      setError(null);    // Reset error state before fetching
-
+      setLoading(true);
+      setError(null);
       try {
-        const res = await fetch('/api/admin/blog');
-
-        // Check if the request was successful
+        const res = await fetch(selectedCategory ? `/api/admin/blog?category=${selectedCategory}` : '/api/admin/blog');
         if (!res.ok) {
           throw new Error('Failed to fetch blogs');
         }
-
         const data = await res.json();
-
-        // Make sure we have blogs to display
-        if (data.blogs && data.blogs.length > 0) {
-          setBlogs(data.blogs);
-        } else {
-          setBlogs([]);
-        }
+        setBlogs(data.blogs || []);
       } catch (error) {
-        // Set the error if fetching fails
-        console.error('Error fetching blogs:', error);
         setError(error.message || 'An error occurred while fetching blogs.');
       } finally {
-        setLoading(false);  // Set loading to false after fetching completes
+        setLoading(false);
       }
     };
-
     fetchBlogs();
+  }, [selectedCategory]);
+
+  // Fetch categories when the component loads
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/categories');
+        if (!res.ok) {
+          throw new Error('Failed to fetch categories');
+        }
+        const data = await res.json();
+        setCategories(data.categories || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
   }, []);
+
+  // Handle category selection
+  const handleCategoryChange = async (categoryId) => {
+    setSelectedCategory(categoryId); // Update selected category
+  };
+
+  // Function to get the category name by its ID
+  const getCategoryName = (categoryId) => {
+    const category = categories.find((cat) => cat._id === categoryId);
+    return category ? category.name : 'Uncategorized';
+  };
 
   return (
     <div className="container mx-auto p-4 flex flex-col lg:flex-row">
+      {/* Main blog content */}
       <div className="w-full lg:w-2/3 mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center">Blog Posts</h1>
+        {/* <h1 className="text-4xl font-bold mb-8 text-center">Blog Posts</h1> */}
+
+        {/* Category Dropdown */}
+        <div className="mb-6 text-center">
+          {/* Button for "All Categories" */}
+          <button
+            onClick={() => handleCategoryChange('')} // Show all categories
+            className={` m-2 ${selectedCategory === '' ? ' text-blue-500' : 'text-gray-400'}`}
+          >
+            All Categories
+          </button>
+
+          {/* Buttons for each category */}
+          {categories.map((category) => (
+            <button
+              key={category._id}
+              onClick={() => handleCategoryChange(category._id)} // Pass the category ID
+              className={`m-2 ${selectedCategory === category._id ? ' text-blue-500' : 'text-gray-400'}`}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
+
 
         {/* Loading Indicator */}
         {loading && (
@@ -64,45 +107,40 @@ const BlogPage = () => {
 
         {/* Blog Listing */}
         {!loading && !error && blogs.length > 0 ? (
-          blogs.map((blog) => {
-            // Debugging: Log the blog object and image URL
-            console.log('Blog:', blog);
-            console.log('Blog Image:', blog.image);
-
-            return (
-              <Link href={`/Blog/${blog._id}`} passHref key={blog._id}>
-                <div className="border-b shadow-sm p-4 mt-10 rounded-2xl bg-white flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 w-full">
-                  {blog.image ?(
-                    <img
-                      src={blog.image} // Cloudinary URL stored in MongoDB
-                      alt={blog.title}
-                      className="w-full md:w-48 h-28 object-cover mb-4 rounded-md"
-                    />
-                  ) : (
-                    <div>No Image Available</div> // Debug if the image URL is missing
-                  )}
-                  <div className="flex flex-col flex-1">
-                    <h2 className="text-lg font-bold mb-2 cursor-pointer hover:underline text-center md:text-left">
-                      {blog.title}
-                    </h2>
-                    <div
-                      className="text-gray-600 text-sm mb-4 text-center md:text-left"
-                      dangerouslySetInnerHTML={{
-                        __html:
-                          blog.content.length > 100
-                            ? `${blog.content.substring(0, 100)}...`
-                            : blog.content,
-                      }}
-                    ></div>
-                    <div className="flex justify-between items-center text-gray-600 text-sm">
-                      <span>{blog.likes} Likes</span>
-                      <span>{blog.comments?.length || 0} Comments</span>
-                    </div>
+          blogs.map((blog) => (
+            <Link href={`/Blog/${blog._id}`} passHref key={blog._id}>
+              <div className="border-b shadow-sm p-4 mt-10 rounded-2xl bg-white flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 w-full">
+                {blog.image && (
+                  <img
+                    src={blog.image}
+                    alt={blog.title}
+                    className="w-full md:w-40 h-40 object-cover rounded-lg"
+                  />
+                )}
+                <div className="flex flex-col flex-1">
+                  <h2 className="text-lg font-bold mb-2 cursor-pointer hover:underline text-center md:text-left">
+                    {blog.title}
+                  </h2>
+                  <div
+                    className="text-gray-600 text-sm mb-4 text-center md:text-left"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        blog.content.length > 100
+                          ? `${blog.content.substring(0, 100)}...`
+                          : blog.content,
+                    }}
+                  ></div>
+                  <p className="text-sm text-gray-500">
+                    <strong>Category:</strong> {blog.category ? blog.category.name : 'Uncategorized'}
+                  </p>
+                  <div className="flex justify-between items-center text-gray-600 text-sm">
+                    <span>{blog.likes} Likes</span>
+                    <span>{blog.comments?.length || 0} Comments</span>
                   </div>
                 </div>
-              </Link>
-            );
-          })
+              </div>
+            </Link>
+          ))
         ) : (
           !loading && <p className="text-center">No blogs available.</p>
         )}
@@ -110,6 +148,13 @@ const BlogPage = () => {
         {/* Random Blogs Section */}
         <RandomBlogsSection blogs={blogs} />
       </div>
+
+      {/* Right Sidebar with RecentBlogsSection (Sticky) */}
+      <div className="w-full lg:w-1/3 mt-10 lg:mt-0 lg:pl-8">
+        <RecentBlogsSection blogs={blogs} />
+      </div>
+
+      {/* Ads Section */}
       <AdsSection />
     </div>
   );

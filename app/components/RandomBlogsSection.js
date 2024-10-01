@@ -8,18 +8,18 @@ const RandomBlogsSection = ({ blogs }) => {
         // Shuffle blogs only if blogs are available
         if (blogs && blogs.length > 0) {
             const shuffledBlogs = [...blogs].sort(() => 0.5 - Math.random());
-            setRandomBlogs(shuffledBlogs.slice(0, 9)); // Display up to 9 random blogs
+            setRandomBlogs(shuffledBlogs.slice(0, 3)); // Display up to 3 random blogs
         }
     }, [blogs]); // Run this when blogs data changes
 
     return (
-        <div>
-            <h1 className="text-4xl font-bold mb-8 text-center">Recent Blogs</h1>
+        <div className='hidden lg:block'>
+            <h1 className="text-2xl text-center font-bold mt-8">More You Like</h1>
             <div className="grid grid-cols-1 mt-10 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {randomBlogs.length > 0 ? (
                     randomBlogs.map((blog) => (
-                        <Link href={`/Blog/${blog._id}`} passHref>
-                            <div key={blog._id} className="border p-4 rounded-lg shadow-lg bg-white flex flex-col items-center">
+                        <Link href={`/Blog/${blog._id}`} passHref key={blog._id}>
+                            <div className="border p-4 rounded-lg shadow-lg bg-white flex flex-col items-center">
                                 {blog.image && (
                                     <img
                                         src={blog.image}
