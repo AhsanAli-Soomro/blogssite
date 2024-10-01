@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css';
+import 'react-quill/dist/quill.snow.css';  // Make sure the CSS is correctly imported
+
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+
 
 const AdminPage = () => {
   const [title, setTitle] = useState('');
@@ -17,7 +19,7 @@ const AdminPage = () => {
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const adminPassword = 'admin123';
+  const adminPassword = 'soomro@786';
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -39,62 +41,111 @@ const AdminPage = () => {
     }
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-  
-    reader.onloadend = () => {
-      setImage(reader.result); // Set the Base64 string for uploading to Cloudinary
-    };
-  
-    if (file) {
-      reader.readAsDataURL(file);
-    }
+ const handleImageUpload = (e) => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+
+  reader.onloadend = () => {
+    setImage(reader.result);  // Convert file to Base64 and set the image state
   };
+
+  if (file) {
+    reader.readAsDataURL(file);  // Read the file as a Base64 encoded string
+  }
+};
+
+const submitBlog = async (e) => {
+  e.preventDefault();
+
+  const method = editMode ? 'PUT' : 'POST';
+  const apiUrl = editMode ? `/api/admin/blog/${editId}` : '/api/admin/blog';
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title,
+        content,
+        image: image ? image : existingImage,  // Send the Base64 image string
+      }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      setMessage(editMode ? 'Blog updated successfully!' : 'Blog created successfully!');
+      setTitle('');
+      setContent('');
+      setImage(null);  // Clear the image input
+      setExistingImage(null);
+      setEditMode(false);
+      setEditId(null);
+
+      // Fetch updated blogs after successful submission
+      const updatedBlogs = await fetch('/api/admin/blog');
+      const updatedData = await updatedBlogs.json();
+      setBlogs(updatedData.blogs);
+    } else {
+      setMessage(result.message || 'Unknown error occurred');
+    }
+  } catch (error) {
+    console.error('Error submitting the blog:', error);
+    setMessage('Error submitting the blog');
+  }
+};
+
   
 
-  const submitBlog = async (e) => {
-    e.preventDefault();
 
-    const method = editMode ? 'PUT' : 'POST';
-    const apiUrl = editMode ? `/api/admin/blog/${editId}` : '/api/admin/blog';
 
-    try {
-      const response = await fetch(apiUrl, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title,
-          content,
-          image: image ? image : existingImage, // Send the new image if it exists, otherwise send the existing one
-        }),
-      });
+  // const submitBlog = async (e) => {
+  //   e.preventDefault();
 
-      const result = await response.json();
+  //   const method = editMode ? 'PUT' : 'POST';
+  //   const apiUrl = editMode ? `/api/admin/blog/${editId}` : '/api/admin/blog';
 
-      if (response.ok) {
-        setMessage(editMode ? 'Blog updated successfully!' : 'Blog created successfully!');
-        setTitle('');
-        setContent('');
-        setImage(null); // Clear the image input
-        setExistingImage(null); // Clear existing image after update
-        setEditMode(false);
-        setEditId(null);
+  //   try {
+  //     const response = await fetch(apiUrl, {
+  //       method: method,
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         title,
+  //         content,
+  //         image: image ? image : existingImage, // Send new image or use the existing one
+  //       }),
+  //     });
 
-        // Fetch updated blogs after successful submission
-        const updatedBlogs = await fetch('/api/admin/blog');
-        const updatedData = await updatedBlogs.json();
-        setBlogs(updatedData.blogs);
-      } else {
-        setMessage(result.message || 'Unknown error occurred');
-      }
-    } catch (error) {
-      console.error('Error during blog submission:', error);
-      setMessage('Error submitting the blog');
-    }
-  };
+  //     // Handle the response
+  //     const result = await response.json();
+
+  //     if (response.ok) {
+  //       setMessage(editMode ? 'Blog updated successfully!' : 'Blog created successfully!');
+  //       // Clear form fields after success
+  //       setTitle('');
+  //       setContent('');
+  //       setImage(null);
+  //       setExistingImage(null);
+  //       setEditMode(false);
+  //       setEditId(null);
+
+  //       // Refresh blog list after creating or updating a blog
+  //       const updatedBlogs = await fetch('/api/admin/blog');
+  //       const updatedData = await updatedBlogs.json();
+  //       setBlogs(updatedData.blogs);
+  //     } else {
+  //       setMessage(result.message || 'Unknown error occurred');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error during blog submission:', error);
+  //     setMessage('Error submitting the blog');
+  //   }
+  // };
+
 
 
   const handleDelete = async (id) => {
@@ -172,7 +223,7 @@ const AdminPage = () => {
               {blogs.map((blog) => (
                 <div key={blog._id} className="border p-4 mt-4 rounded-lg shadow-lg bg-white">
                   <h3 className="font-bold">{blog.title}</h3>
-                  {blog.image && (
+                  {blog.image && blog.image.includes('res.cloudinary.com') && (
                     <img src={blog.image} alt={blog.title} className="w-full h-48 object-cover mb-4 rounded-md" />
                   )}
                   <div

@@ -47,22 +47,22 @@ const BlogDetailPage = ({ params }) => {
       try {
         const res = await fetch(`/api/admin/blog/${id}/comment`);
         const data = await res.json();
-  
+
         console.log("Comments data:", data); // Check if createdAt is present
-  
+
         setComments(data); // Set the comments from the response
       } catch (error) {
         console.error('Error fetching comments:', error);
       }
     };
-  
+
     fetchComments();
   }, [id]);
-  
+
 
   const handleComment = async (e) => {
     e.preventDefault();
-    
+
     if (!user) {
       console.error('User is not signed in');
       return;

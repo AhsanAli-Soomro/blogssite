@@ -13,7 +13,6 @@ const SubNav = () => {
           <SignInButton />
         </div>
       </SignedOut>
-
     </div>
   )
 }

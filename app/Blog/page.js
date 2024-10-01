@@ -17,7 +17,7 @@ const BlogPage = () => {
 
       try {
         const res = await fetch('/api/admin/blog');
-        
+
         // Check if the request was successful
         if (!res.ok) {
           throw new Error('Failed to fetch blogs');
@@ -33,6 +33,7 @@ const BlogPage = () => {
         }
       } catch (error) {
         // Set the error if fetching fails
+        console.error('Error fetching blogs:', error);
         setError(error.message || 'An error occurred while fetching blogs.');
       } finally {
         setLoading(false);  // Set loading to false after fetching completes
@@ -46,7 +47,7 @@ const BlogPage = () => {
     <div className="container mx-auto p-4 flex flex-col lg:flex-row">
       <div className="w-full lg:w-2/3 mx-auto">
         <h1 className="text-4xl font-bold mb-8 text-center">Blog Posts</h1>
-        
+
         {/* Loading Indicator */}
         {loading && (
           <div className="text-center">
@@ -63,37 +64,45 @@ const BlogPage = () => {
 
         {/* Blog Listing */}
         {!loading && !error && blogs.length > 0 ? (
-          blogs.map((blog) => (
-            <Link href={`/Blog/${blog._id}`} passHref key={blog._id}>
-              <div className="border-b shadow-sm p-4 rounded-2xl bg-white flex flex-col md:flex-row md:space-x-6 items-center space-y-4 md:space-y-0 w-full">
-                {blog.image && (
-                  <img
-                    src={blog.image}
-                    alt={blog.title}
-                    className="w-full md:w-40 h-40 object-cover rounded-lg"
-                  />
-                )}
-                <div className="flex flex-col flex-1">
-                  <h2 className="text-lg font-bold mb-2 cursor-pointer hover:underline text-center md:text-left">
-                    {blog.title}
-                  </h2>
-                  <div
-                    className="text-gray-600 text-sm mb-4 text-center md:text-left"
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        blog.content.length > 100
-                          ? `${blog.content.substring(0, 100)}...`
-                          : blog.content,
-                    }}
-                  ></div>
-                  <div className="flex justify-between items-center text-gray-600 text-sm">
-                    <span>{blog.likes} Likes</span>
-                    <span>{blog.comments?.length || 0} Comments</span>
+          blogs.map((blog) => {
+            // Debugging: Log the blog object and image URL
+            console.log('Blog:', blog);
+            console.log('Blog Image:', blog.image);
+
+            return (
+              <Link href={`/Blog/${blog._id}`} passHref key={blog._id}>
+                <div className="border-b shadow-sm p-4 mt-10 rounded-2xl bg-white flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 w-full">
+                  {blog.image ?(
+                    <img
+                      src={blog.image} // Cloudinary URL stored in MongoDB
+                      alt={blog.title}
+                      className="w-full md:w-48 h-28 object-cover mb-4 rounded-md"
+                    />
+                  ) : (
+                    <div>No Image Available</div> // Debug if the image URL is missing
+                  )}
+                  <div className="flex flex-col flex-1">
+                    <h2 className="text-lg font-bold mb-2 cursor-pointer hover:underline text-center md:text-left">
+                      {blog.title}
+                    </h2>
+                    <div
+                      className="text-gray-600 text-sm mb-4 text-center md:text-left"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          blog.content.length > 100
+                            ? `${blog.content.substring(0, 100)}...`
+                            : blog.content,
+                      }}
+                    ></div>
+                    <div className="flex justify-between items-center text-gray-600 text-sm">
+                      <span>{blog.likes} Likes</span>
+                      <span>{blog.comments?.length || 0} Comments</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))
+              </Link>
+            );
+          })
         ) : (
           !loading && <p className="text-center">No blogs available.</p>
         )}

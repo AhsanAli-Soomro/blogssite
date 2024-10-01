@@ -28,7 +28,7 @@ const DarkModeToggle = () => {
     };
 
     return (
-        <div className='w-full pr-5 pt-2 justify-end inline-flex'>
+        <div className='w-full pt-24 pr-5 sticky top-0 p-4 justify-end inline-flex'>
             <label className="inline-flex gap-2 cursor-pointer">
                 <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
                 <input type="checkbox" value="" className="sr-only peer" onClick={toggleDarkMode} />
