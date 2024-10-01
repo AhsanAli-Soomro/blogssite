@@ -78,13 +78,41 @@ export async function PUT(request, { params }) {
 
 
 // Handle GET request to list blog posts
-export async function GET() {
+export async function GET(req) {
   await dbConnect();
+  
+  const { searchParams } = new URL(req.url);
+  const page = parseInt(searchParams.get('page')) || 1;
+  const limit = parseInt(searchParams.get('limit')) || 10;
+
   try {
-    const blogs = await Blog.find({}); // This will include the 'image' field by default
-    return NextResponse.json({ blogs }, { status: 200 });
+    const blogs = await Blog.find()
+      .select('title content image')  // Only fetch necessary fields
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean()
+      .populate('comments'); // Populate comments if necessary
+
+    const totalBlogs = await Blog.countDocuments();
+    
+    return new Response(JSON.stringify({ blogs, totalPages: Math.ceil(totalBlogs / limit) }), {
+      status: 200,
+      headers: {
+        'Cache-Control': 's-maxage=60, stale-while-revalidate',
+      },
+    });
   } catch (error) {
-    return NextResponse.json({ message: 'Error fetching blogs', error: error.message }, { status: 500 });
+    return new Response(JSON.stringify({ error: 'Failed to fetch blogs' }), { status: 500 });
   }
 }
+
+// export async function GET() {
+//   await dbConnect();
+//   try {
+//     const blogs = await Blog.find({}); // This will include the 'image' field by default
+//     return NextResponse.json({ blogs }, { status: 200 });
+//   } catch (error) {
+//     return NextResponse.json({ message: 'Error fetching blogs', error: error.message }, { status: 500 });
+//   }
+// }
 
