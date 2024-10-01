@@ -81,26 +81,22 @@ export async function PUT(request, { params }) {
 export async function GET(req) {
   await dbConnect();
   
+  // Parse query params for pagination (e.g., page and limit)
   const { searchParams } = new URL(req.url);
-  const page = parseInt(searchParams.get('page')) || 1;
-  const limit = parseInt(searchParams.get('limit')) || 10;
+  const page = parseInt(searchParams.get('page')) || 1; // Default to page 1
+  const limit = parseInt(searchParams.get('limit')) || 10; // Default to 10 posts per page
 
   try {
     const blogs = await Blog.find()
-      .select('title content image')  // Only fetch necessary fields
+      .select('title content image')
       .skip((page - 1) * limit)
       .limit(limit)
-      .lean()
-      .populate('comments'); // Populate comments if necessary
-
-    const totalBlogs = await Blog.countDocuments();
+      .lean();
+      
+    // Get the total count of blogs for pagination metadata
+    const count = await Blog.countDocuments();
     
-    return new Response(JSON.stringify({ blogs, totalPages: Math.ceil(totalBlogs / limit) }), {
-      status: 200,
-      headers: {
-        'Cache-Control': 's-maxage=60, stale-while-revalidate',
-      },
-    });
+    return new Response(JSON.stringify({ blogs, totalPages: Math.ceil(count / limit) }), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ error: 'Failed to fetch blogs' }), { status: 500 });
   }
