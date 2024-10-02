@@ -90,7 +90,7 @@ export async function PUT(request, { params }) {
 // Handle GET request for listing blog posts with pagination
 export async function GET(req) {
   await dbConnect();
-  
+
   // Parse query params for pagination (e.g., page, limit, category)
   const { searchParams } = new URL(req.url);
   const page = parseInt(searchParams.get('page')) || 1; // Default to page 1
@@ -100,9 +100,9 @@ export async function GET(req) {
   try {
     const filter = category ? { category } : {}; // Filter by category if provided
     const blogs = await Blog.find(filter)
-    .populate('comments', '_id name')   
-    .populate('category', 'name') 
-    .select('title content comment category image')
+      // .populate('comments', '_id name')
+      .populate('category', 'name')
+      .select('title content comment category image')
 
       .skip((page - 1) * limit)
       .limit(limit)
@@ -110,7 +110,7 @@ export async function GET(req) {
 
     // Get the total count of blogs for pagination metadata
     const count = await Blog.countDocuments(filter);
-    
+
     return new Response(JSON.stringify({ blogs, totalPages: Math.ceil(count / limit) }), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ error: 'Failed to fetch blogs' }), { status: 500 });
