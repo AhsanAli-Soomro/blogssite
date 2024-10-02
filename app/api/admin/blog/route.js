@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../../../lib/db';
 import Blog from '../../../../models/Blog';
+import Category from '../../../../models/Category';
 import cloudinary from 'cloudinary';
 
 // Configure Cloudinary using environment variables
@@ -20,6 +21,12 @@ export async function POST(request) {
   }
 
   try {
+    // Validate the category
+    const existingCategory = await Category.findById(category);
+    if (!existingCategory) {
+      return NextResponse.json({ message: 'Invalid category' }, { status: 400 });
+    }
+
     let imageUrl = null;
 
     // Upload image to Cloudinary if provided
@@ -35,7 +42,7 @@ export async function POST(request) {
       }
     }
 
-    // Create the blog post with the category reference
+    // Create the blog post
     const newBlog = new Blog({
       title,
       content,
@@ -49,6 +56,7 @@ export async function POST(request) {
     return NextResponse.json({ message: 'Error creating blog post', error: error.message }, { status: 500 });
   }
 }
+
 
 // Handle blog updates (PUT request)
 export async function PUT(request, { params }) {
@@ -64,6 +72,14 @@ export async function PUT(request, { params }) {
     const blog = await Blog.findById(id);
     if (!blog) {
       return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
+    }
+
+    // Validate the category if it is being updated
+    if (category) {
+      const existingCategory = await Category.findById(category);
+      if (!existingCategory) {
+        return NextResponse.json({ message: 'Invalid category' }, { status: 400 });
+      }
     }
 
     let imageUrl = blog.image;
@@ -101,10 +117,10 @@ export async function PUT(request, { params }) {
   }
 }
 
-// Handle GET request for listing blog posts with pagination
+
 export async function GET(request) {
   await dbConnect();
-  
+
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get('page')) || 1;
   const limit = parseInt(searchParams.get('limit')) || 10;
@@ -112,15 +128,14 @@ export async function GET(request) {
 
   try {
     const filter = category ? { category } : {};
-    
-    // Fetch blogs from the database
+
     const blogs = await Blog.find(filter)
-      .populate('category', 'name') // Populate category field if it exists
-      .select('title content category image') // Select relevant fields
+      .populate('category', 'name') // Populate category name
+      .select('title content category image')
       .skip((page - 1) * limit)
       .limit(limit)
-      .lean(); // Converts documents to plain JavaScript objects
-    
+      .lean();
+
     const totalBlogs = await Blog.countDocuments(filter);
 
     return new Response(
