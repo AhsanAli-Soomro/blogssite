@@ -36,10 +36,11 @@ const RecentBlogsSection = ({ blogs }) => {
                                                     : blog.title,
                                         }}
                                     />
-                                    {/* <div className="flex justify-between items-center text-gray-600 text-sm w-full">
-                                        <span>{blog.likes} Likes</span>
-                                        <span>{blog.comments?.length || 0} Comments</span>
-                                    </div> */}
+                                    <p className="text-sm text-gray-500">
+                                        <strong>Category:</strong> {blog.category && blog.category.length > 0
+                                            ? blog.category.map(cat => cat.name).join(', ')
+                                            : 'Uncategorized'}
+                                    </p>
                                 </div>
                             </div>
                         </Link>

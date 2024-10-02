@@ -5,7 +5,7 @@ const BlogSchema = new mongoose.Schema({
   content: { type: String, required: true },
   image: { type: String },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }], 
-  category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }], 
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
   createdAt: { type: Date, default: Date.now },
 }, { timestamps: true });
 

@@ -62,10 +62,19 @@ const BlogPage = () => {
                           : blog.content,
                     }}
                   ></div>
+                  <p className="text-sm text-gray-500">
+                    <strong>Comments:</strong> {blog.commentsCount} {blog.commentsCount === 1 ? 'Comment' : 'Comments'}
+                  </p>
 
                   <p className="text-sm text-gray-500">
-                    <strong>Category:</strong> {blog.category ? blog.category.name : 'Uncategorized'}
+                    <strong>Category:</strong> {blog.category && blog.category.length > 0
+                      ? blog.category.map(cat => cat.name).join(', ')
+                      : 'Uncategorized'}
                   </p>
+
+
+                  {console.log(blog.category.name)}
+
                 </div>
               </div>
             </Link>

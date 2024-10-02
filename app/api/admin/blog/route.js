@@ -119,7 +119,6 @@ export async function PUT(request, { params }) {
 }
 
 
-// Sample GET request in /api/admin/blog
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get('page')) || 1; // Default to page 1
@@ -129,18 +128,26 @@ export async function GET(request) {
   try {
     const filter = category ? { category } : {};
 
+    // Fetch blogs but do NOT populate the full comments
     const blogs = await Blog.find(filter)
-      .populate('category', 'name')
-      .select('title content category image')
+      .populate('category', 'name') // Populate only the name field of the category
+      .select('title content category image comments') // Select only the required fields including the comments array for count
       .skip((page - 1) * limit)
       .limit(limit)
       .lean();
 
+    // Count total documents for pagination
     const totalBlogs = await Blog.countDocuments(filter);
+
+    // Instead of populating comments, just use the length of the comments array
+    const blogsWithCommentsCount = blogs.map(blog => ({
+      ...blog,
+      commentsCount: blog.comments.length // Use the length of the comments array
+    }));
 
     return new Response(
       JSON.stringify({
-        blogs,
+        blogs: blogsWithCommentsCount,
         totalPages: Math.ceil(totalBlogs / limit),
         currentPage: page,
       }),
@@ -153,4 +160,5 @@ export async function GET(request) {
     );
   }
 }
+
 
