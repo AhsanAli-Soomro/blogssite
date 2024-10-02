@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import DarkModeToggle from './components/DarkModeToggle';
+import { DataProvider } from "./context/DataContext"; // Import the provider
 import Head from "next/head";
 
 const geistSans = localFont({
@@ -27,6 +28,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
+      <DataProvider>
+
       <html lang="en">
         <Head>
           {/* Basic Meta Tags */}
@@ -57,26 +60,27 @@ export default function RootLayout({ children }) {
             as="font"
             type="font/woff"
             crossOrigin="anonymous"
-          />
+            />
           <link
             rel="preload"
             href="./fonts/GeistMonoVF.woff"
             as="font"
             type="font/woff"
             crossOrigin="anonymous"
-          />
+            />
 
           {/* SEO enhancements */}
           <meta name="robots" content="index, follow" />
         </Head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+          >
           <Navbar />
           <DarkModeToggle />
           {children}
         </body>
       </html>
+          </DataProvider>
     </ClerkProvider>
   );
 }

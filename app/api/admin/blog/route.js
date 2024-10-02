@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '../../../../lib/db';
 import Blog from '../../../../models/Blog';
 import Category from '../../../../models/Category';
+import Comment from '../../../../models/Comment';
 import cloudinary from 'cloudinary';
 
 // Configure Cloudinary using environment variables
@@ -118,19 +119,18 @@ export async function PUT(request, { params }) {
 }
 
 
+// Sample GET request in /api/admin/blog
 export async function GET(request) {
-  await dbConnect();
-
   const { searchParams } = new URL(request.url);
-  const page = parseInt(searchParams.get('page')) || 1;
-  const limit = parseInt(searchParams.get('limit')) || 10;
+  const page = parseInt(searchParams.get('page')) || 1; // Default to page 1
+  const limit = parseInt(searchParams.get('limit')) || 10; // Default to 10 posts per page
   const category = searchParams.get('category');
 
   try {
     const filter = category ? { category } : {};
 
     const blogs = await Blog.find(filter)
-      .populate('category', 'name') // Populate category name
+      .populate('category', 'name')
       .select('title content category image')
       .skip((page - 1) * limit)
       .limit(limit)
@@ -139,14 +139,18 @@ export async function GET(request) {
     const totalBlogs = await Blog.countDocuments(filter);
 
     return new Response(
-      JSON.stringify({ blogs, totalPages: Math.ceil(totalBlogs / limit) }),
+      JSON.stringify({
+        blogs,
+        totalPages: Math.ceil(totalBlogs / limit),
+        currentPage: page,
+      }),
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error fetching blogs:', error);
     return new Response(
       JSON.stringify({ message: 'Error fetching blogs', error: error.message }),
       { status: 500 }
     );
   }
 }
+

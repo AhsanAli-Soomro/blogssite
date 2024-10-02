@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import { useState, useEffect } from 'react';
 import { useUser, SignInButton } from '@clerk/nextjs';
 import BlogContent from '../../components/BlogContent';
@@ -20,25 +21,14 @@ const BlogDetailPage = ({ params }) => {
       try {
         const res = await fetch(`/api/admin/blog/${id}`);
         const data = await res.json();
-
-        // Set blog data
         setBlog(data);
-
-        if (
-          isSignedIn &&
-          user &&
-          user.primaryEmailAddress &&
-          data.likedBy?.includes(user.primaryEmailAddress.emailAddress)
-        ) {
-          setIsLiked(true);
-        }
       } catch (error) {
         console.error('Error fetching blog:', error);
       }
     };
 
     fetchBlog();
-  }, [id, isSignedIn, user]);
+  }, [id]);
 
   // Fetch comments
   useEffect(() => {
@@ -46,9 +36,6 @@ const BlogDetailPage = ({ params }) => {
       try {
         const res = await fetch(`/api/admin/blog/${id}/comment`);
         const data = await res.json();
-
-        console.log("Comments data:", data); // Check if createdAt is present
-
         setComments(data); // Set the comments from the response
       } catch (error) {
         console.error('Error fetching comments:', error);
@@ -58,17 +45,16 @@ const BlogDetailPage = ({ params }) => {
     fetchComments();
   }, [id]);
 
-
+  // Handle submitting a comment
   const handleComment = async (e) => {
     e.preventDefault();
-
     if (!user) {
       console.error('User is not signed in');
       return;
     }
 
     try {
-      const authorName = user.firstName + ' ' + user.lastName; // Get the user's name
+      const authorName = `${user.firstName} ${user.lastName}`; // Get the user's name
 
       const response = await fetch(`/api/admin/blog/${id}/comment`, {
         method: 'POST',
@@ -77,7 +63,7 @@ const BlogDetailPage = ({ params }) => {
         },
         body: JSON.stringify({
           content,
-          author: authorName, // Pass the author's name from Clerk
+          author: authorName,
         }),
       });
 
@@ -105,9 +91,9 @@ const BlogDetailPage = ({ params }) => {
         <CommentsList comments={comments} />
         {isSignedIn ? (
           <CommentForm
-          content={content}
-          setContent={setContent}
-          handleComment={handleComment}
+            content={content}
+            setContent={setContent}
+            handleComment={handleComment}
           />
         ) : (
           <SignInButton mode="modal">

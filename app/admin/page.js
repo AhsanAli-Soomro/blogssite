@@ -1,23 +1,22 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css'; // Import the Quill editor CSS
 import Compressor from 'compressorjs'; // Import Compressor.js
+import { DataContext } from '../context/DataContext'; // Import DataContext
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 const AdminPage = () => {
-  // State variables
+  // State variables for blog content
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null); // This stores the compressed image
   const [existingImage, setExistingImage] = useState(null); // For existing images when editing
   const [category, setCategory] = useState(''); // For selecting category in blogs
-  const [categories, setCategories] = useState([]); // List of available categories
   const [newCategory, setNewCategory] = useState(''); // For creating a new category
   const [message, setMessage] = useState('');
-  const [blogs, setBlogs] = useState([]);
   const [editMode, setEditMode] = useState(false); // For toggling between edit and submit modes
   const [editId, setEditId] = useState(null); // For tracking the blog post being edited
 
@@ -26,35 +25,19 @@ const AdminPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // For login status
   const adminPassword = ''; // Set your admin password here
 
-  // Fetch categories from the server
-  useEffect(() => {
-    if (isAuthenticated) {
-      const fetchCategories = async () => {
-        try {
-          const response = await fetch('/api/categories');
-          const data = await response.json();
-          setCategories(data.categories || []); // Assuming the data contains an array of categories
-        } catch (error) {
-          console.error('Error fetching categories:', error);
-        }
-      };
-      fetchCategories();
-    }
-  }, [isAuthenticated]);
+  // Fetching data from the context
+  const {
+    blogs,
+    categories,
+    loading,
+    error,
+    fetchCategories, // Fetch categories if needed (useful for refreshing categories)
+  } = useContext(DataContext);
 
-  // Fetch blogs from the server when the component loads (if authenticated)
+  // Effect to refetch categories after authentication
   useEffect(() => {
     if (isAuthenticated) {
-      const fetchBlogs = async () => {
-        try {
-          const response = await fetch('/api/admin/blog');
-          const data = await response.json();
-          setBlogs(data.blogs);
-        } catch (error) {
-          console.error('Error fetching blogs:', error);
-        }
-      };
-      fetchBlogs();
+      fetchCategories(); // Optionally fetch categories again after authentication
     }
   }, [isAuthenticated]);
 
@@ -122,11 +105,6 @@ const AdminPage = () => {
         setCategory('');
         setEditMode(false);
         setEditId(null);
-
-        // Refetch blogs after submission
-        const updatedBlogs = await fetch('/api/admin/blog');
-        const updatedData = await updatedBlogs.json();
-        setBlogs(updatedData.blogs);
       } else {
         setMessage('Error: ' + result.message);
       }
@@ -140,7 +118,6 @@ const AdminPage = () => {
     const response = await fetch(`/api/admin/blog/${id}`, { method: 'DELETE' });
     if (response.ok) {
       setMessage('Blog deleted successfully!');
-      setBlogs(blogs.filter((blog) => blog._id !== id)); // Remove deleted blog from the UI
     }
   };
 
@@ -175,7 +152,7 @@ const AdminPage = () => {
       if (response.ok) {
         setMessage('Category added successfully!');
         setNewCategory(''); // Clear the category input
-        setCategories([...categories, result.category]); // Add the new category to the state
+        fetchCategories(); // Refetch categories after adding
       } else {
         setMessage('Error: ' + result.message);
       }
@@ -183,6 +160,49 @@ const AdminPage = () => {
       setMessage('Error adding category: ' + error.message);
     }
   };
+
+  // Function to handle updating a category
+  const updateCategory = async (categoryId, updatedName) => {
+    try {
+      const response = await fetch('/api/categories', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: categoryId, name: updatedName }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setMessage('Category updated successfully!');
+        fetchCategories(); // Refetch categories after updating
+      } else {
+        setMessage('Error: ' + result.message);
+      }
+    } catch (error) {
+      setMessage('Error updating category: ' + error.message);
+    }
+  };
+
+  // Function to handle deleting a category
+  const deleteCategory = async (categoryId) => {
+    try {
+      const response = await fetch('/api/categories', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: categoryId }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setMessage('Category deleted successfully!');
+        fetchCategories(); // Refetch categories after deletion
+      } else {
+        setMessage('Error: ' + result.message);
+      }
+    } catch (error) {
+      setMessage('Error deleting category: ' + error.message);
+    }
+  };
+
 
   return (
     <div className="container mx-auto p-4">
@@ -192,6 +212,8 @@ const AdminPage = () => {
             {editMode ? 'Edit Blog Post' : 'Add New Blog Post'}
           </h1>
           {message && <p className="text-green-600 mb-4">{message}</p>}
+          {loading && <p>Loading...</p>}
+          {error && <p className="text-red-600">{error}</p>}
 
           {/* Blog Form */}
           <form onSubmit={submitBlog}>
@@ -232,13 +254,12 @@ const AdminPage = () => {
               required
             >
               <option value="">Select a Category</option>
-              {categories.map((cat, index) => (
-                <option key={cat._id || index} value={cat._id || ''}>
-                  {cat.name || 'Unnamed Category'}
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
                 </option>
               ))}
             </select>
-
 
             <button className="bg-blue-500 text-white px-4 py-2 rounded" type="submit">
               {editMode ? 'Update Blog' : 'Submit Blog'}
@@ -260,6 +281,30 @@ const AdminPage = () => {
               Add Category
             </button>
           </form>
+          {/* Category Listing */}
+          <h2 className="text-2xl font-bold mt-8">All Categories</h2>
+          <ul>
+            {categories.map((cat) => (
+              <li key={cat._id} className="flex justify-between items-center">
+                <span>{cat.name}</span>
+                <div>
+                  <button
+                    onClick={() => updateCategory(cat._id, prompt('Enter new category name', cat.name))}
+                    className="bg-yellow-500 text-white px-4 py-2 rounded"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => deleteCategory(cat._id)}
+                    className="bg-red-500 text-white px-4 py-2 rounded ml-2"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+
 
           {/* Blog Listing */}
           <h2 className="text-2xl font-bold mt-8">All Blogs</h2>
