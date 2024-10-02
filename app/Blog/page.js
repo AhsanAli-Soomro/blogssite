@@ -51,10 +51,10 @@ const BlogPage = () => {
                   />
                 )}
                 <div className="flex flex-col flex-1">
-                  <h2 className="text-lg font-bold mb-2 cursor-pointer hover:underline text-center md:text-left">
+                  <h2 className="text-lg font-bold mb-2 cursor-pointer hover:underline md:text-left">
                     {blog.title}
                   </h2>
-                  <div className="text-gray-600 text-sm mb-4 text-center md:text-left"
+                  <div className="text-gray-600 text-sm mb-4 md:text-left"
                     dangerouslySetInnerHTML={{
                       __html:
                         blog.content.length > 100
