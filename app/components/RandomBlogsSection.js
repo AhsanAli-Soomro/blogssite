@@ -41,14 +41,14 @@ const RandomBlogsSection = ({ blogs }) => {
                                         dangerouslySetInnerHTML={{
                                             __html:
                                                 blog.content.length > 60
-                                                    ? `${blog.content.substring(0, 65)}...`
+                                                    ? `${blog.content.substring(0, 100)}...`
                                                     : blog.content,
                                         }}
                                     />
-                                    <div className="flex justify-between items-center text-gray-600 text-sm w-full">
+                                    {/* <div className="flex justify-between items-center text-gray-600 text-sm w-full">
                                         <span>{blog.likes} Likes</span>
                                         <span>{blog.comments?.length || 0} Comments</span>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </Link>

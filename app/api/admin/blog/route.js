@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '../../../../lib/db';
 import Blog from '../../../../models/Blog';
 import Category from '../../../../models/Category';
-import Comment from '../../../../models/Comment';
+// import Comment from '../../../../models/Comment';
 import cloudinary from 'cloudinary';
 
 // Configure Cloudinary using environment variables

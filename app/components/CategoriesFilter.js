@@ -2,20 +2,19 @@ import React, { useState } from 'react';
 
 const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange }) => {
   const [openGamesDropdown, setOpenGamesDropdown] = useState(false);
-  const [openBusinessDropdown, setOpenBusinessDropdown] = useState(false);
 
   // Find specific categories
-  const sportsCategory = categories.find(category => category.name === 'Sport');
-  const cryptoCategory = categories.find(category => category.name === 'Games');
+  const pubgCategory = categories.find(category => category.name === 'PUBG');
+  const conterStrikeCategory = categories.find(category => category.name === 'Counter Strike');
 
-  // Filter out "Sport" from the list so it is shown only under "Games"
+  // Filter out "Sport" and "Technology" from the main list so they are shown only in the dropdowns
   const filteredCategories = categories.filter(
-    category => category.name !== 'Sport'
+    category => category.name !== 'PUBG' && category.name !== 'Counter Strike'
   );
 
   return (
     <div className="mb-6 text-center">
-      {/* Button for "All Categories" */}
+      {/* Home Button */}
       <button
         onClick={() => onCategoryChange('')}
         className={`m-2 ${selectedCategory === '' ? 'text-blue-500' : 'text-gray-400'}`}
@@ -30,11 +29,9 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
           className="inline-block m-2 relative"
           onMouseEnter={() => {
             if (category.name === 'Games') setOpenGamesDropdown(true);
-            if (category.name === 'Business') setOpenBusinessDropdown(true);
           }}
           onMouseLeave={() => {
             if (category.name === 'Games') setOpenGamesDropdown(false);
-            if (category.name === 'Business') setOpenBusinessDropdown(false);
           }}
         >
           <button
@@ -46,38 +43,26 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
 
           {/* Show Sports under Games as a dropdown on hover */}
           {openGamesDropdown && category.name === 'Games' && (
-            <div className="absolute left-0 bg-white shadow-lg p-2 rounded-lg z-10">
-              {sportsCategory && (
+            <div className="absolute bg-white shadow-lg p-1 rounded-lg z-10 w-48"> {/* Increase width */}
+              {pubgCategory && (
                 <button
-                  onClick={() => onCategoryChange(sportsCategory._id)}
-                  className="text-sm text-gray-600 hover:text-blue-500 block"
+                  onClick={() => onCategoryChange(pubgCategory._id)}
+                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
                 >
-                  {sportsCategory.name}
+                  {pubgCategory.name}
+                </button>
+              )}
+              {conterStrikeCategory && (
+                <button
+                  onClick={() => onCategoryChange(conterStrikeCategory._id)}
+                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                >
+                  {conterStrikeCategory.name}
                 </button>
               )}
             </div>
           )}
 
-          {/* Show Crypto and another category under Business as a dropdown on hover */}
-          {openBusinessDropdown && category.name === 'Business' && (
-            <div className="absolute left-0 bg-white shadow-lg p-2 rounded-lg z-10">
-              {cryptoCategory && (
-                <button
-                  onClick={() => onCategoryChange(cryptoCategory._id)}
-                  className="text-sm text-gray-600 hover:text-blue-500 block"
-                >
-                  {cryptoCategory.name}
-                </button>
-              )}
-              {/* Add another subcategory under Business if needed */}
-              {/* <button
-                onClick={() => onCategoryChange('another-subcategory-id')} // Replace with actual subcategory id
-                className="text-sm text-gray-600 hover:text-blue-500 block"
-              >
-                Another Subcategory
-              </button> */}
-            </div>
-          )}
         </div>
       ))}
     </div>

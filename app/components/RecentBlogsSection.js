@@ -32,14 +32,14 @@ const RecentBlogsSection = ({ blogs }) => {
                                         dangerouslySetInnerHTML={{
                                             __html:
                                                 blog.title.length > 40
-                                                    ? `${blog.title.substring(0, 40)}...`
+                                                    ? `${blog.title.substring(0, 200)}...`
                                                     : blog.title,
                                         }}
                                     />
-                                    <div className="flex justify-between items-center text-gray-600 text-sm w-full">
+                                    {/* <div className="flex justify-between items-center text-gray-600 text-sm w-full">
                                         <span>{blog.likes} Likes</span>
                                         <span>{blog.comments?.length || 0} Comments</span>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </Link>
