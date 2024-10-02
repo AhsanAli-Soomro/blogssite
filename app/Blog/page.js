@@ -130,13 +130,13 @@
                             : blog.content,
                       }}
                     ></div>
-                    <p className="text-sm text-gray-500">
+                    {/* <p className="text-sm text-gray-500">
                       <strong>Category:</strong> {blog.category ? blog.category.name : 'Uncategorized'}
                     </p>
                     <div className="flex justify-between items-center text-gray-600 text-sm">
                       <span>{blog.likes} Likes</span>
                       <span>{blog.comments?.length || 0} Comments</span>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </Link>

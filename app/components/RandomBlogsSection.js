@@ -14,7 +14,7 @@ const RandomBlogsSection = ({ blogs }) => {
 
     return (
         <div className='hidden lg:block'>
-            <h1 className="text-2xl text-center font-bold mt-8">More You Like</h1>
+            <h1 className="text-2xl text-center font-bold mt-8">Related Posts</h1>
             <div className="grid grid-cols-1 mt-10 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {randomBlogs.length > 0 ? (
                     randomBlogs.map((blog) => (

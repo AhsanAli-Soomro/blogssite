@@ -11,7 +11,6 @@ const BlogDetailPage = ({ params }) => {
   const { id } = params;
   const [blog, setBlog] = useState(null);
   const { user, isSignedIn } = useUser();
-  const [isLiked, setIsLiked] = useState(false);
   const [content, setContent] = useState('');
   const [comments, setComments] = useState([]); // Keep track of comments
 
@@ -106,9 +105,9 @@ const BlogDetailPage = ({ params }) => {
         <CommentsList comments={comments} />
         {isSignedIn ? (
           <CommentForm
-            content={content}
-            setContent={setContent}
-            handleComment={handleComment}
+          content={content}
+          setContent={setContent}
+          handleComment={handleComment}
           />
         ) : (
           <SignInButton mode="modal">
