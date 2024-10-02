@@ -111,25 +111,27 @@ export async function GET(req) {
   const category = searchParams.get('category'); // Optional category filter
 
   try {
-    const filter = category ? { category } : {}; // Filter by category if provided
+    const filter = category ? { category } : {};
     const blogs = await Blog.find(filter)
       .populate('category', 'name')
       .select('title content category image')
       .skip((page - 1) * limit)
       .limit(limit)
       .lean();
-
-    // Get the total count of blogs for pagination
+  
     const count = await Blog.countDocuments(filter);
-
-    // Send the response with blogs and pagination metadata
-    return new Response(JSON.stringify({
-      blogs,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
-      totalBlogs: count,
-    }), { status: 200 });
+  
+    return new Response(JSON.stringify({ blogs, totalPages: Math.ceil(count / limit) }), {
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store', // Disable caching
+        'Content-Type': 'application/json',
+      },
+    });
   } catch (error) {
-    return new Response(JSON.stringify({ message: 'Failed to fetch blogs', error: error.message }), { status: 500 });
+    console.error('Failed to fetch blogs:', error.message);
+    return new Response(JSON.stringify({ message: 'Failed to fetch blogs', error: error.message }), {
+      status: 500,
+    });
   }
 }
