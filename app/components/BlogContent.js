@@ -5,7 +5,7 @@ const BlogContent = ({ blog }) => {
         <img
           src={blog.image}
           alt={blog.title}
-          className="w-full h-64 object-cover rounded-lg mb-4"
+          className="w-full h-full object-cover rounded-md mb-4"
         />
       )}
       <h1 className="text-4xl font-bold mb-4 text-gray-900">{blog.title}</h1>

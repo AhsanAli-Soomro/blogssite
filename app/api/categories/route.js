@@ -26,12 +26,14 @@ export async function POST(request) {
 
 // Get all categories
 export async function GET() {
-  await dbConnect();
-
   try {
-    const categories = await Category.find({}).select('_id name'); // Ensure _id and name are returned
-    return NextResponse.json({ categories }, { status: 200 });
+    // Fetch categories logic here
+    const categories = await Category.find().lean();
+
+    return new Response(JSON.stringify({ categories }), { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: 'Error fetching categories', error: error.message }, { status: 500 });
+    console.error('Error fetching categories:', error); // Log the error details
+    return new Response(JSON.stringify({ message: 'Failed to fetch categories', error: error.message }), { status: 500 });
   }
 }
+

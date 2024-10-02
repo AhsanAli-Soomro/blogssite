@@ -106,9 +106,9 @@ export async function GET(req) {
   await dbConnect();
 
   const { searchParams } = new URL(req.url);
-  const page = parseInt(searchParams.get('page')) || 1; // Default to page 1
-  const limit = parseInt(searchParams.get('limit')) || 10; // Default to 10 posts per page
-  const category = searchParams.get('category'); // Optional category filter
+  const page = parseInt(searchParams.get('page')) || 1;
+  const limit = parseInt(searchParams.get('limit')) || 10;
+  const category = searchParams.get('category');
 
   try {
     const filter = category ? { category } : {};
@@ -118,20 +118,12 @@ export async function GET(req) {
       .skip((page - 1) * limit)
       .limit(limit)
       .lean();
-  
+
     const count = await Blog.countDocuments(filter);
-  
-    return new Response(JSON.stringify({ blogs, totalPages: Math.ceil(count / limit) }), {
-      status: 200,
-      headers: {
-        'Cache-Control': 'no-store', // Disable caching
-        'Content-Type': 'application/json',
-      },
-    });
+
+    return new Response(JSON.stringify({ blogs, totalPages: Math.ceil(count / limit) }), { status: 200 });
   } catch (error) {
-    console.error('Failed to fetch blogs:', error.message);
-    return new Response(JSON.stringify({ message: 'Failed to fetch blogs', error: error.message }), {
-      status: 500,
-    });
+    console.error('Error fetching blogs:', error); // Log the error details
+    return new Response(JSON.stringify({ message: 'Failed to fetch blogs', error: error.message }), { status: 500 });
   }
 }
