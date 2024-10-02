@@ -102,28 +102,36 @@ export async function PUT(request, { params }) {
 }
 
 // Handle GET request for listing blog posts with pagination
-export async function GET(req) {
+export async function GET(request) {
   await dbConnect();
-
-  const { searchParams } = new URL(req.url);
+  
+  const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get('page')) || 1;
   const limit = parseInt(searchParams.get('limit')) || 10;
   const category = searchParams.get('category');
 
   try {
     const filter = category ? { category } : {};
+    
+    // Fetch blogs from the database
     const blogs = await Blog.find(filter)
-      .populate('category', 'name')
-      .select('title content category image')
+      .populate('category', 'name') // Populate category field if it exists
+      .select('title content category image') // Select relevant fields
       .skip((page - 1) * limit)
       .limit(limit)
-      .lean();
+      .lean(); // Converts documents to plain JavaScript objects
+    
+    const totalBlogs = await Blog.countDocuments(filter);
 
-    const count = await Blog.countDocuments(filter);
-
-    return new Response(JSON.stringify({ blogs, totalPages: Math.ceil(count / limit) }), { status: 200 });
+    return new Response(
+      JSON.stringify({ blogs, totalPages: Math.ceil(totalBlogs / limit) }),
+      { status: 200 }
+    );
   } catch (error) {
-    console.error('Error fetching blogs:', error); // Log the error details
-    return new Response(JSON.stringify({ message: 'Failed to fetch blogs', error: error.message }), { status: 500 });
+    console.error('Error fetching blogs:', error);
+    return new Response(
+      JSON.stringify({ message: 'Error fetching blogs', error: error.message }),
+      { status: 500 }
+    );
   }
 }
