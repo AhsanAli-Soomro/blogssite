@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import dbConnect from '../../../../../lib/db';
 import Blog from '../../../../../models/Blog';
 import cloudinary from 'cloudinary';
+import runMiddleware, { cors } from '../../../../../CORSmiddleware';
+import validator from 'validator';  // Importing validator
 
-// Configure Cloudinary using environment variables (if image upload is needed)
+// Configure Cloudinary using environment variables
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -12,12 +14,34 @@ cloudinary.v2.config({
 
 // Handle blog updates (PUT request)
 export async function PUT(request, { params }) {
+  await runMiddleware(request, NextResponse, cors);  // Apply CORS middleware
   await dbConnect();  // Ensure that the database is connected
+
   const { id } = params;  // Extract the blog ID from the request parameters
   const { title, content, image, category } = await request.json();  // Get the blog data from the request body
 
-  if (!id) {
-    return NextResponse.json({ message: 'Blog ID is required' }, { status: 400 });
+  // Validate Blog ID (Must be a valid MongoDB ObjectId)
+  if (!validator.isMongoId(id)) {
+    return NextResponse.json({ message: 'Invalid Blog ID' }, { status: 400 });
+  }
+
+  if (!title || !content) {
+    return NextResponse.json({ message: 'Title and content are required' }, { status: 400 });
+  }
+
+  // Validate title length
+  if (!validator.isLength(title, { min: 5 })) {
+    return NextResponse.json({ message: 'Title must be at least 5 characters long' }, { status: 400 });
+  }
+
+  // If image is provided, validate the image URL
+  if (image && !validator.isURL(image)) {
+    return NextResponse.json({ message: 'Invalid image URL' }, { status: 400 });
+  }
+
+  // Validate category ID if provided
+  if (category && !validator.isMongoId(category)) {
+    return NextResponse.json({ message: 'Invalid Category ID' }, { status: 400 });
   }
 
   try {
@@ -65,11 +89,13 @@ export async function PUT(request, { params }) {
 
 // Handle blog deletion (DELETE request)
 export async function DELETE(request, { params }) {
-  await dbConnect();
-  const { id } = params;
+  await dbConnect();  // Ensure that the database is connected
 
-  if (!id) {
-    return NextResponse.json({ message: 'Blog ID is required' }, { status: 400 });
+  const { id } = params;  // Extract the blog ID from the request parameters
+
+  // Validate Blog ID (Must be a valid MongoDB ObjectId)
+  if (!validator.isMongoId(id)) {
+    return NextResponse.json({ message: 'Invalid Blog ID' }, { status: 400 });
   }
 
   try {
@@ -92,11 +118,16 @@ export async function DELETE(request, { params }) {
   }
 }
 
-
 // Handle GET request to fetch a blog by ID
 export async function GET(request, { params }) {
-  await dbConnect();
-  const { id } = params;
+  await dbConnect();  // Ensure that the database is connected
+
+  const { id } = params;  // Extract the blog ID from the request parameters
+
+  // Validate Blog ID (Must be a valid MongoDB ObjectId)
+  if (!validator.isMongoId(id)) {
+    return NextResponse.json({ message: 'Invalid Blog ID' }, { status: 400 });
+  }
 
   try {
     // Find the blog post and populate the comments field with full details

@@ -4,6 +4,8 @@ import Blog from '../../../../models/Blog';
 import Category from '../../../../models/Category';
 // import Comment from '../../../../models/Comment';
 import cloudinary from 'cloudinary';
+import validator from 'validator';
+import runMiddleware, { cors } from '../../../../CORSmiddleware';
 
 // Configure Cloudinary using environment variables
 cloudinary.v2.config({
@@ -13,45 +15,40 @@ cloudinary.v2.config({
 });
 
 // Handle blog creation (POST request)
-export async function POST(request) {
+export async function POST(request, res) {
+  await runMiddleware(request, res, cors);  // Apply CORS middleware
   await dbConnect();
+
   const { title, content, image, category } = await request.json();
 
+  // Input Validation using validator
   if (!title || !content || !category) {
     return NextResponse.json({ message: 'Title, content, and category are required' }, { status: 400 });
   }
 
+  if (!validator.isLength(title, { min: 5 })) {
+    return NextResponse.json({ message: 'Title must be at least 5 characters long' }, { status: 400 });
+  }
+
+  if (image && !validator.isURL(image)) {
+    return NextResponse.json({ message: 'Invalid image URL' }, { status: 400 });
+  }
+
   try {
-    // Validate the category
     const existingCategory = await Category.findById(category);
     if (!existingCategory) {
       return NextResponse.json({ message: 'Invalid category' }, { status: 400 });
     }
 
     let imageUrl = null;
-
-    // Upload image to Cloudinary if provided
     if (image) {
-      try {
-        const result = await cloudinary.v2.uploader.upload(image, {
-          folder: 'blogs',
-          resource_type: 'image',
-        });
-        imageUrl = result.secure_url;
-      } catch (error) {
-        return NextResponse.json({ message: 'Failed to upload image', error: error.message }, { status: 500 });
-      }
+      const result = await cloudinary.v2.uploader.upload(image, { folder: 'blogs', resource_type: 'image' });
+      imageUrl = result.secure_url;
     }
 
-    // Create the blog post
-    const newBlog = new Blog({
-      title,
-      content,
-      image: imageUrl,
-      category,
-    });
-
+    const newBlog = new Blog({ title, content, image: imageUrl, category });
     await newBlog.save();
+
     return NextResponse.json({ message: 'Blog post created successfully!', blog: newBlog }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ message: 'Error creating blog post', error: error.message }, { status: 500 });
@@ -120,44 +117,37 @@ export async function PUT(request, { params }) {
 
 
 export async function GET(request) {
+  await dbConnect();
+
   const { searchParams } = new URL(request.url);
-  const page = parseInt(searchParams.get('page')) || 1; // Default to page 1
-  const limit = parseInt(searchParams.get('limit')) || 10; // Default to 10 posts per page
+  const page = parseInt(searchParams.get('page')) || 1;
+  const limit = parseInt(searchParams.get('limit')) || 10;
   const category = searchParams.get('category');
 
   try {
     const filter = category ? { category } : {};
-
-    // Fetch blogs but do NOT populate the full comments
     const blogs = await Blog.find(filter)
-      .populate('category', 'name') // Populate only the name field of the category
-      .select('title content category image comments') // Select only the required fields including the comments array for count
+      .populate('category', 'name')
+      .select('title content category image comments')
+      .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
       .lean();
 
-    // Count total documents for pagination
     const totalBlogs = await Blog.countDocuments(filter);
 
-    // Instead of populating comments, just use the length of the comments array
     const blogsWithCommentsCount = blogs.map(blog => ({
       ...blog,
-      commentsCount: blog.comments.length // Use the length of the comments array
+      commentsCount: blog.comments.length,
     }));
 
-    return new Response(
-      JSON.stringify({
-        blogs: blogsWithCommentsCount,
-        totalPages: Math.ceil(totalBlogs / limit),
-        currentPage: page,
-      }),
-      { status: 200 }
-    );
+    return new Response(JSON.stringify({
+      blogs: blogsWithCommentsCount,
+      totalPages: Math.ceil(totalBlogs / limit),
+      currentPage: page,
+    }), { status: 200 });
   } catch (error) {
-    return new Response(
-      JSON.stringify({ message: 'Error fetching blogs', error: error.message }),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ message: 'Error fetching blogs', error: error.message }), { status: 500 });
   }
 }
 
