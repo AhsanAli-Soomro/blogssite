@@ -13,34 +13,37 @@ const RecentBlogsSection = ({ blogs }) => {
     }, [blogs]); // Run this when blogs data changes
 
     return (
-        <div className="lg:pl-8 lg:block lg:sticky lg:top-24">
+        <div className="lg:pl-3 lg:block lg:sticky lg:top-24">
             <h1 className="text-lg mt-4 font-bold text-center">Most Recent Blogs</h1>
             <div className="mt-4 gap-4">
                 {recentBlogs.length > 0 ? (
                     recentBlogs.map((blog) => (
                         <Link href={`/Blog/${blog._id}`} passHref key={blog._id}>
-                            <div className="border p-4 mt-2 rounded-lg shadow-lg gap-3 bg-white flex">
+                            <div className="p-2 mt-2 rounded-lg shadow-lg gap-3 flex">
                                 {blog.image && (
                                     <img
                                         src={blog.image}
                                         alt={blog.title}
-                                        className="w-20 h-20 object-cover rounded-lg mb-4"
+                                        className="w-20 h-20 object-cover rounded-lg"
                                     />
                                 )}
-                                <div className="flex flex-col items-center">
-                                    <h2 className="text-sm font-bold mb-2 cursor-pointer hover:underline"
+                                <div className="flex justify-between flex-col">
+                                    <h2 className="text-xs font-bold cursor-pointer hover:underline"
                                         dangerouslySetInnerHTML={{
                                             __html:
                                                 blog.title.length > 40
-                                                    ? `${blog.title.substring(0, 200)}...`
+                                                    ? `${blog.title.substring(0, 25)}...`
                                                     : blog.title,
                                         }}
                                     />
-                                    <p className="text-sm text-gray-500">
-                                        <strong>Category:</strong> {blog.category && blog.category.length > 0
-                                            ? blog.category.map(cat => cat.name).join(', ')
-                                            : 'Uncategorized'}
-                                    </p>
+                                    <div>
+                                        <p className="text-xs text-gray-500">
+                                            <strong>Comments:</strong> {blog.commentsCount} {blog.commentsCount === 1}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            <strong>Category:</strong> {blog.category.name}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </Link>

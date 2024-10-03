@@ -42,39 +42,45 @@ const BlogPage = () => {
         {!loading && !error && blogs.length > 0 ? (
           blogs.map((blog) => (
             <Link href={`/Blog/${blog._id}`} passHref key={blog._id}>
-              <div className="border-b shadow-sm p-4 mt-10 rounded-2xl bg-white flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 w-full">
+              <div className="shadow-sm p-4 rounded-2xl flex md:space-x-6 space-x-4 md:space-y-0 w-full">
                 {blog.image && (
                   <img
                     src={blog.image}
                     alt={blog.title}
-                    className="w-full md:w-40 h-40 object-cover rounded-lg"
+                    className="w-28 md:w-40 md:h-40 h-28 object-cover rounded-lg"
                   />
                 )}
-                <div className="flex flex-col flex-1">
-                  <h2 className="text-lg font-bold mb-2 cursor-pointer hover:underline md:text-left">
-                    {blog.title}
-                  </h2>
-                  <div className="text-gray-600 text-sm mb-4 md:text-left"
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        blog.content.length > 100
-                          ? `${blog.content.substring(0, 100)}...`
-                          : blog.content,
-                    }}
-                  ></div>
-                  <p className="text-sm text-gray-500">
-                    <strong>Comments:</strong> {blog.commentsCount} {blog.commentsCount === 1 ? 'Comment' : 'Comments'}
-                  </p>
+                <div className="flex flex-col justify-between">
+                  <div>
+                    <h2 className="md:text-lg text-sm text-blue-500 font-bold cursor-pointer md:text-left">
+                      {blog.title}
+                    </h2>
+                    <p className="text-sm md:text-left hidden md:flex"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          blog.content.length > 100
+                            ? `${blog.content.substring(0, 100)}...`
+                            : blog.content,
+                      }}
+                    >
+                    </p>
+                  </div>
+                  <div className="block justify-between md:flex">
 
-                  <p className="text-sm text-gray-500">
-                    <strong>Category:</strong> {blog.category.name}
-                    {/* {blog.category && blog.category.length > 0
+                    <p className="text-sm text-gray-500">
+                      <strong>Comments:</strong> {blog.commentsCount} {blog.commentsCount === 1}
+                    </p>
+
+                    <p className="text-sm text-gray-500">
+                      <strong>Category:</strong> {blog.category.name}
+                      {/* {blog.category && blog.category.length > 0
                       ? blog.category.map(cat => cat.name).join(', ')
                       : 'Uncategorized'} */}
-                  </p>
+                    </p>
+                  </div>
 
 
-                  {console.log(blog.category.name)}
+                  {/* {console.log(blog.category.name)} */}
 
                 </div>
               </div>
