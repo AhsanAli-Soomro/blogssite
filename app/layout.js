@@ -73,7 +73,7 @@ export default function RootLayout({ children }) {
           <meta name="robots" content="index, follow" />
         </Head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased mt-24 md:mt-20`}
           >
           <Navbar />
           <DarkModeToggle />

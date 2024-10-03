@@ -5,14 +5,17 @@ const DarkModeToggle = () => {
     const [darkMode, setDarkMode] = useState(false);
 
     useEffect(() => {
-        // Check if dark mode was previously enabled
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.classList.add('dark');
-            setDarkMode(true);
-        } else {
-            document.documentElement.classList.remove('dark');
+        if (typeof window !== 'undefined') {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+                setDarkMode(true);
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
         }
     }, []);
+
 
     const toggleDarkMode = () => {
         const isDarkMode = !darkMode;
@@ -28,13 +31,16 @@ const DarkModeToggle = () => {
     };
 
     return (
-        <div className='w-full pt-24 pr-5 sticky top-0 p-4 justify-end inline-flex'>
-            <label className="inline-flex gap-2 cursor-pointer">
-                <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
-                <input type="checkbox" value="" className="sr-only peer" onClick={toggleDarkMode} />
-                <div className="relative w-11 h-6 bg-gray-200 peer-focus:ring-blue-300 rounded-full dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-            </label>
-        </div>
+<div className='w-auto flex justify-end items-center py-5 px-1 md:p-4 sticky top-36'>
+    <label className="inline-flex gap-2 cursor-pointer z-20 text-right">
+        <span className="ms-3 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-300">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+        <input type="checkbox" value="" className="sr-only peer" onClick={toggleDarkMode} />
+        <div className="relative w-7 sm:w-9 bg-gray-200 peer-focus:ring-blue-300 rounded-full dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 sm:after:h-4 sm:after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+    </label>
+</div>
+
+
+
     );
 };
 

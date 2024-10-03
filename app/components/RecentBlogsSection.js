@@ -13,7 +13,7 @@ const RecentBlogsSection = ({ blogs }) => {
     }, [blogs]); // Run this when blogs data changes
 
     return (
-        <div className="lg:pl-3 lg:block lg:sticky lg:top-24">
+        <div className="lg:pl-3 lg:block lg:sticky lg:top-36">
             <h1 className="text-lg mt-4 font-bold text-center">Most Recent Blogs</h1>
             <div className="mt-4 gap-4">
                 {recentBlogs.length > 0 ? (

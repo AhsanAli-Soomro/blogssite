@@ -24,13 +24,13 @@ const BlogPage = () => {
 
   return (
     <div className="container mx-auto p-4 flex flex-col lg:flex-row">
-      <div className="w-full lg:w-2/3 mx-auto">
+      <div className="w-full sticky lg:w-2/3 mx-auto">
         {/* Use the reusable CategoriesFilter component */}
-        <CategoriesFilter
+        {/* <CategoriesFilter
           categories={categories}
           selectedCategory={selectedCategory}
           onCategoryChange={handleCategoryChange}
-        />
+        /> */}
 
         {/* Loading Indicator */}
         {loading && <LoadingSpinner />}
@@ -42,7 +42,7 @@ const BlogPage = () => {
         {!loading && !error && blogs.length > 0 ? (
           blogs.map((blog) => (
             <Link href={`/Blog/${blog._id}`} passHref key={blog._id}>
-              <div className="shadow-sm p-4 rounded-2xl flex md:space-x-6 space-x-4 md:space-y-0 w-full">
+              <div className="shadow-sm p-4 z-10 rounded-2xl flex md:space-x-6 space-x-4 md:space-y-0 w-full">
                 {blog.image && (
                   <img
                     src={blog.image}

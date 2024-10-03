@@ -1,19 +1,25 @@
-import { ClerkProvider, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+"use client"
+import React, { useContext } from 'react'
+import CategoriesFilter from './CategoriesFilter'; // Reusable component
+import { DataContext } from '../context/DataContext'
+import Link from 'next/link';
 
-import React from 'react'
 
 const SubNav = () => {
+
+  const {
+    categories,
+    selectedCategory,
+    handleCategoryChange,
+  } = useContext(DataContext);
   return (
-    <div>
-      <SignedIn>
-        <UserButton />
-      </SignedIn>
-      <SignedOut>
-        <div className="">
-          <SignInButton />
-        </div>
-      </SignedOut>
-    </div>
+    <Link href="/">
+      <CategoriesFilter
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategoryChange={handleCategoryChange}
+        />
+        </Link>
   )
 }
 
