@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const RandomBlogsSection = ({ blogs }) => {
     const [randomBlogs, setRandomBlogs] = useState([]);
@@ -21,7 +22,9 @@ const RandomBlogsSection = ({ blogs }) => {
                         <Link href={`/Blog/${blog._id}`} passHref key={blog._id}>
                             <div className="border p-4 rounded-lg shadow-lgflex flex-col items-center">
                                 {blog.image && (
-                                    <img
+                                    <Image
+                                    width={1000}
+                                    height={1000}
                                         src={blog.image}
                                         alt={blog.title}
                                         className="w-full h-40 object-cover rounded-lg mb-4"

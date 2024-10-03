@@ -1,3 +1,5 @@
+import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState, useEffect } from "react";
 
 const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange }) => {
@@ -32,9 +34,8 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
 
   return (
     <div
-      className={`mb-24 z-10 text-xs md:text-base bg-slate-100 w-full fixed top-24 text-center transition-transform duration-500 ${
-        isVisible ? "translate-y-0" : "-translate-y-24"
-      }`}
+      className={`mb-24 z-10 text-xs md:text-sm bg-slate-100 w-full fixed top-24 text-center transition-transform duration-500 ${isVisible ? "translate-y-0" : "-translate-y-24"
+        }`}
     >
       {/* Home Button */}
       <button
@@ -46,7 +47,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
 
       {/* Buttons for each category */}
       {filteredCategories.map(category => (
-        <div
+        <ul
           key={category._id}
           className="inline-block m-2 relative"
           onMouseEnter={() => {
@@ -56,6 +57,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
             if (category.name === "Games") setOpenGamesDropdown(false);
           }}
         >
+          <FontAwesomeIcon className="text-gray-400 pr-2 " icon={faEllipsisVertical} />
           <button
             onClick={() => onCategoryChange(category._id)}
             className={`${selectedCategory === category._id ? "text-blue-500" : "text-gray-400"}`}
@@ -84,7 +86,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               )}
             </div>
           )}
-        </div>
+        </ul>
       ))}
     </div>
   );

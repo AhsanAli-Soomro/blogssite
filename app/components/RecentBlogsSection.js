@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const RecentBlogsSection = ({ blogs }) => {
     const [recentBlogs, setRecentBlogs] = useState([]);
@@ -21,7 +22,9 @@ const RecentBlogsSection = ({ blogs }) => {
                         <Link href={`/Blog/${blog._id}`} passHref key={blog._id}>
                             <div className="p-2 mt-2 rounded-lg shadow-lg gap-3 flex">
                                 {blog.image && (
-                                    <img
+                                    <Image
+                                    width={1000}
+                                    height={1000}
                                         src={blog.image}
                                         alt={blog.title}
                                         className="w-20 h-20 object-cover rounded-lg"

@@ -1,8 +1,12 @@
+import Image from "next/image";
+
 const BlogContent = ({ blog }) => {
   return (
     <div>
       {blog.image && (
-        <img
+        <Image
+        width={1000}
+        height={1000}
           src={blog.image}
           alt={blog.title}
           className="w-full h-full object-cover rounded-md mb-4"

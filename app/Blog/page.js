@@ -8,6 +8,7 @@ import RecentBlogsSection from '../components/RecentBlogsSection';
 import CategoriesFilter from '../components/CategoriesFilter'; // Reusable component
 import { DataContext } from '../context/DataContext'; // Import context
 import LoadingSpinner from "../components/LoadingSpinner";
+import Image from "next/image";
 
 const BlogPage = () => {
   const {
@@ -44,7 +45,9 @@ const BlogPage = () => {
             <Link href={`/Blog/${blog._id}`} passHref key={blog._id}>
               <div className="shadow-sm p-4 z-10 rounded-2xl flex md:space-x-6 space-x-4 md:space-y-0 w-full">
                 {blog.image && (
-                  <img
+                  <Image
+                    width={1000}
+                    height={1000}
                     src={blog.image}
                     alt={blog.title}
                     className="w-28 md:w-40 md:h-40 h-28 object-cover rounded-lg"
