@@ -2,39 +2,27 @@ import { NextResponse } from 'next/server';
 import dbConnect from '../../../../lib/db';
 import Blog from '../../../../models/Blog';
 import Category from '../../../../models/Category';
-// import Comment from '../../../../models/Comment';
 import cloudinary from 'cloudinary';
-import validator from 'validator';
-import runMiddleware, { cors } from '../../../../CORSmiddleware';
 
-// Configure Cloudinary using environment variables
+
+// Cloudinary configuration
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Handle blog creation (POST request)
-export async function POST(request, res) {
-  await runMiddleware(request, res, cors);  // Apply CORS middleware
-  await dbConnect();
-
-  const { title, content, image, category } = await request.json();
-
-  // Input Validation using validator
-  if (!title || !content || !category) {
-    return NextResponse.json({ message: 'Title, content, and category are required' }, { status: 400 });
-  }
-
-  if (!validator.isLength(title, { min: 5 })) {
-    return NextResponse.json({ message: 'Title must be at least 5 characters long' }, { status: 400 });
-  }
-
-  if (image && !validator.isURL(image)) {
-    return NextResponse.json({ message: 'Invalid image URL' }, { status: 400 });
-  }
-
+// POST handler (Create Blog)
+export async function POST(request) {
   try {
+    await dbConnect();
+    let body = await request.json();
+    const { title, content, image, category } = body;
+
+    if (!title || !content || !category) {
+      return NextResponse.json({ message: 'Title, content, and category are required' }, { status: 400 });
+    }
+
     const existingCategory = await Category.findById(category);
     if (!existingCategory) {
       return NextResponse.json({ message: 'Invalid category' }, { status: 400 });
@@ -42,8 +30,15 @@ export async function POST(request, res) {
 
     let imageUrl = null;
     if (image) {
-      const result = await cloudinary.v2.uploader.upload(image, { folder: 'blogs', resource_type: 'image' });
-      imageUrl = result.secure_url;
+      try {
+        const result = await cloudinary.v2.uploader.upload(image, {
+          folder: 'blogs',
+          resource_type: 'image',
+        });
+        imageUrl = result.secure_url;
+      } catch (error) {
+        return NextResponse.json({ message: 'Failed to upload image', error: error.message }, { status: 500 });
+      }
     }
 
     const newBlog = new Blog({ title, content, image: imageUrl, category });
@@ -55,54 +50,38 @@ export async function POST(request, res) {
   }
 }
 
-
-// Handle blog updates (PUT request)
+// PUT handler (Update Blog)
 export async function PUT(request, { params }) {
-  await dbConnect();
-  const { id } = params;
-  const { title, content, image, category } = await request.json();
-
-  if (!id) {
-    return NextResponse.json({ message: 'Blog ID is required' }, { status: 400 });
-  }
-
   try {
+    await dbConnect();
+    const { id } = params;
+    let body = await request.json(); // Parse JSON request body
+    const { title, content, image, category } = body;
+
+    if (!id) {
+      return NextResponse.json({ message: 'Blog ID is required' }, { status: 400 });
+    }
+
     const blog = await Blog.findById(id);
     if (!blog) {
       return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
     }
 
-    // Validate the category if it is being updated
-    if (category) {
-      const existingCategory = await Category.findById(category);
-      if (!existingCategory) {
-        return NextResponse.json({ message: 'Invalid category' }, { status: 400 });
-      }
-    }
-
     let imageUrl = blog.image;
 
-    // If a new image is provided, upload it and delete the old one
     if (image && image !== blog.image) {
       try {
-        // Delete the old image from Cloudinary if exists
         if (blog.image) {
           const publicId = blog.image.split('/').pop().split('.')[0];
           await cloudinary.v2.uploader.destroy(`blogs/${publicId}`);
         }
-
-        // Upload new image
-        const result = await cloudinary.v2.uploader.upload(image, {
-          folder: 'blogs',
-          resource_type: 'image',
-        });
+        const result = await cloudinary.v2.uploader.upload(image, { folder: 'blogs', resource_type: 'image' });
         imageUrl = result.secure_url;
       } catch (error) {
         return NextResponse.json({ message: 'Failed to upload new image', error: error.message }, { status: 500 });
       }
     }
 
-    // Update blog details
     blog.title = title || blog.title;
     blog.content = content || blog.content;
     blog.image = imageUrl;
@@ -114,6 +93,8 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ message: 'Error updating blog', error: error.message }, { status: 500 });
   }
 }
+
+
 
 
 export async function GET(request) {

@@ -23,8 +23,8 @@ const RandomBlogsSection = ({ blogs }) => {
                             <div className="border p-4 rounded-lg shadow-lgflex flex-col items-center">
                                 {blog.image && (
                                     <Image
-                                    width={1000}
-                                    height={1000}
+                                        width={1000}
+                                        height={1000}
                                         src={blog.image}
                                         alt={blog.title}
                                         className="w-full h-40 object-cover rounded-lg mb-4"
@@ -49,7 +49,9 @@ const RandomBlogsSection = ({ blogs }) => {
                                         }}
                                     />
                                     <p className="text-sm text-gray-500">
-                                        <strong>Category:</strong> {blog.category.name}
+                                        <strong>Category:</strong> {blog.category.name} {blog.category && blog.category.length > 0
+                                            ? blog.category.map(cat => cat.name).join(', ')
+                                            : 'Uncategorized'}
                                     </p>
                                 </div>
                             </div>

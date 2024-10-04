@@ -75,10 +75,11 @@ const BlogPage = () => {
                     </p>
 
                     <p className="text-sm text-gray-500">
-                      <strong>Category:</strong> {blog.category.name}
-                      {/* {blog.category && blog.category.length > 0
+                      <strong>Category:</strong> 
+                      {blog.category.name} 
+                      {blog.category && blog.category.length > 0
                       ? blog.category.map(cat => cat.name).join(', ')
-                      : 'Uncategorized'} */}
+                      : 'Uncategorized'}
                     </p>
                   </div>
 

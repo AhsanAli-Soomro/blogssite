@@ -23,8 +23,8 @@ const RecentBlogsSection = ({ blogs }) => {
                             <div className="p-2 mt-2 rounded-lg shadow-lg gap-3 flex">
                                 {blog.image && (
                                     <Image
-                                    width={1000}
-                                    height={1000}
+                                        width={1000}
+                                        height={1000}
                                         src={blog.image}
                                         alt={blog.title}
                                         className="w-20 h-20 object-cover rounded-lg"
@@ -44,7 +44,10 @@ const RecentBlogsSection = ({ blogs }) => {
                                             <strong>Comments:</strong> {blog.commentsCount} {blog.commentsCount === 1}
                                         </p>
                                         <p className="text-xs text-gray-500">
-                                            <strong>Category:</strong> {blog.category.name}
+                                            <strong>Category:</strong> {blog.category.name ||
+                                            blog.category && blog.category.length > 0
+                                                ? blog.category.map(cat => cat.name).join(', ')
+                                                : 'Uncategorized'}
                                         </p>
                                     </div>
                                 </div>

@@ -1,4 +1,3 @@
-// context/DataContext.js
 "use client";
 
 import { createContext, useState, useEffect } from "react";
@@ -15,28 +14,30 @@ export const DataProvider = ({ children }) => {
   const [totalPages, setTotalPages] = useState(0);
 
   // Fetch blogs
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(
-          selectedCategory
-            ? `/api/admin/blog?category=${selectedCategory}&page=${currentPage}&limit=10`
-            : `/api/admin/blog?page=${currentPage}&limit=10`
-        );
-        if (!res.ok) {
-          throw new Error('Failed to fetch blogs');
-        }
-        const data = await res.json();
-        setBlogs(data.blogs || []);
-        setTotalPages(data.totalPages || 0);
-      } catch (error) {
-        setError(error.message || 'An error occurred while fetching blogs.');
-      } finally {
-        setLoading(false);
+  const fetchBlogs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        selectedCategory
+          ? `/api/admin/blog?category=${selectedCategory}&page=${currentPage}&limit=10`
+          : `/api/admin/blog?page=${currentPage}&limit=10`
+      );
+      if (!res.ok) {
+        throw new Error('Failed to fetch blogs');
       }
-    };
+      const data = await res.json();
+      setBlogs(data.blogs || []);
+      setTotalPages(data.totalPages || 0);
+    } catch (error) {
+      setError(error.message || 'An error occurred while fetching blogs.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch blogs whenever the category or current page changes
+  useEffect(() => {
     fetchBlogs();
   }, [selectedCategory, currentPage]);
 
@@ -61,7 +62,7 @@ export const DataProvider = ({ children }) => {
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to page 1 when category changes
   };
 
   return (
@@ -76,6 +77,7 @@ export const DataProvider = ({ children }) => {
         totalPages,
         setCurrentPage,
         handleCategoryChange,
+        fetchBlogs, // Expose fetchBlogs here
         fetchCategories, // Expose fetchCategories here
       }}
     >
