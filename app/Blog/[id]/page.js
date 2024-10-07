@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useUser, SignInButton } from '@clerk/nextjs';
 import BlogContent from '../../components/BlogContent';
 import CommentsList from '../../components/CommentsList';
 import CommentForm from '../../components/CommentForm';
 import AdsSection from '../../components/AdsComponents';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import RecentBlogsSection from '../../components/RecentBlogsSection';
+import { DataContext } from '../../context/DataContext';
 
 const BlogDetailPage = ({ params }) => {
   const { id } = params;
@@ -14,6 +16,7 @@ const BlogDetailPage = ({ params }) => {
   const { user, isSignedIn } = useUser();
   const [content, setContent] = useState('');
   const [comments, setComments] = useState([]); // Keep track of comments
+  const {blogs} = useContext(DataContext);
 
   // Fetch blog data
   useEffect(() => {
@@ -86,7 +89,7 @@ const BlogDetailPage = ({ params }) => {
   return (
     <div className="container mx-auto p-6 lg:flex gap-6">
       {/* Blog Content */}
-      <div className="w-full lg:w-2/3 bg-white rounded-lg shadow-md p-6 mb-6 lg:mb-0">
+      <div className="w-full lg:w-1/1 bg-white rounded-lg shadow-md p-6 mb-6 lg:mb-0">
         <BlogContent blog={blog} />
         <CommentsList comments={comments} />
         {isSignedIn ? (
@@ -102,6 +105,9 @@ const BlogDetailPage = ({ params }) => {
             </div>
           </SignInButton>
         )}
+      </div>
+      <div className="w-full lg:w-1/3 mt-10 lg:mt-0">
+        <RecentBlogsSection blogs={blogs} />
       </div>
       <AdsSection />
     </div>

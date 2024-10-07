@@ -5,7 +5,7 @@ import Link from 'next/link';
 import AdsSection from '../components/AdsComponents';
 import RandomBlogsSection from '../components/RandomBlogsSection';
 import RecentBlogsSection from '../components/RecentBlogsSection';
-import CategoriesFilter from '../components/CategoriesFilter'; // Reusable component
+import Pagination from '../components/Pagination'; // Import the new Pagination component
 import { DataContext } from '../context/DataContext'; // Import context
 import LoadingSpinner from "../components/LoadingSpinner";
 import Image from "next/image";
@@ -13,26 +13,16 @@ import Image from "next/image";
 const BlogPage = () => {
   const {
     blogs,
-    categories,
-    selectedCategory,
     loading,
     error,
     currentPage,
     totalPages,
     setCurrentPage,
-    handleCategoryChange,
   } = useContext(DataContext);
 
   return (
     <div className="container mx-auto p-4 flex flex-col lg:flex-row">
       <div className="w-full sticky lg:w-2/3 mx-auto">
-        {/* Use the reusable CategoriesFilter component */}
-        {/* <CategoriesFilter
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={handleCategoryChange}
-        /> */}
-
         {/* Loading Indicator */}
         {loading && <LoadingSpinner />}
 
@@ -69,7 +59,6 @@ const BlogPage = () => {
                     </p>
                   </div>
                   <div className="block justify-between md:flex">
-
                     <p className="text-sm text-gray-500">
                       <strong>Comments:</strong> {blog.commentsCount} {blog.commentsCount === 1}
                     </p>
@@ -77,15 +66,8 @@ const BlogPage = () => {
                     <p className="text-sm text-gray-500">
                       <strong>Category: </strong> 
                       {blog.category.name} 
-                      {/* {blog.category && blog.category.length > 0
-                      ? blog.category.map(cat => cat.name).join(', ')
-                      : 'Uncategorized'} */}
                     </p>
                   </div>
-
-
-                  {/* {console.log(blog.category.name)} */}
-
                 </div>
               </div>
             </Link>
@@ -94,18 +76,12 @@ const BlogPage = () => {
           !loading && <p className="text-center">No blogs available.</p>
         )}
 
-        {/* Pagination */}
-        <div className="flex justify-center mt-6">
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentPage(index + 1)}
-              className={`mx-1 px-3 py-1 rounded ${index + 1 === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
+        {/* Use the Pagination component */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
 
         {/* Random Blogs Section */}
         <RandomBlogsSection blogs={blogs} />
