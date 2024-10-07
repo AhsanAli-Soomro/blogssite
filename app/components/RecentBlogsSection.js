@@ -44,10 +44,11 @@ const RecentBlogsSection = ({ blogs }) => {
                                             <strong>Comments:</strong> {blog.commentsCount} {blog.commentsCount === 1}
                                         </p>
                                         <p className="text-xs text-gray-500">
-                                            <strong>Category:</strong> {blog.category.name ||
-                                        blog.category }{blog.category.length > 0
+                                            <strong>Category: </strong> {blog.category.name ||
+                                                blog.category}
+                                            {/* {blog.category.length > 0
                                                 ? blog.category.map(cat => cat.name).join(', ')
-                                                : 'Uncategorized'}
+                                                : 'Uncategorized'} */}
                                         </p>
                                     </div>
                                 </div>

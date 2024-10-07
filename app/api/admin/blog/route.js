@@ -95,8 +95,6 @@ export async function PUT(request, { params }) {
 }
 
 
-
-
 export async function GET(request) {
   await dbConnect();
 

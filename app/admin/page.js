@@ -19,12 +19,15 @@ const AdminPage = () => {
   const [editId, setEditId] = useState(null);
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const adminPassword = ''; // Set admin password here
+  const adminPassword = 'soomro7863'; // Set admin password here
   const {
     blogs,
     categories,
     loading,
+    totalPages,
+    currentPage,
     error,
+    setCurrentPage,
     fetchCategories,
   } = useContext(DataContext);
   const modules = {
@@ -244,25 +247,25 @@ const AdminPage = () => {
           </form>
           <h2 className="text-2xl font-bold mt-8">All Categories</h2>
           <div className="grid grid-cols-1 gap-1 xl:grid-cols-5 sm:grid-cols-3 col-span-4">
-          {categories.map((cat) => (
-            <div key={cat._id} className='flex border shadow-sm p-2 rounded-md items-center justify-between gap-4'>
-              <span className="text-lg">{cat.name}</span>
-              <div className="flex gap-2">
-                <FontAwesomeIcon
-                  className="cursor-pointer text-red-500 hover:text-red-600 transition-colors"
-                  icon={faTrashCan}
-                  onClick={() => deleteCategory(cat._id)}
-                  title="Delete"
-                />
-                <FontAwesomeIcon
-                  className="cursor-pointer text-yellow-500 hover:text-yellow-600 transition-colors"
-                  icon={faPenToSquare}
-                  onClick={() => updateCategory(cat._id, prompt('Enter new category name', cat.name))}
-                  title="Edit"
-                />
+            {categories.map((cat) => (
+              <div key={cat._id} className='flex border shadow-sm p-2 rounded-md items-center justify-between gap-4'>
+                <span className="text-lg">{cat.name}</span>
+                <div className="flex gap-2">
+                  <FontAwesomeIcon
+                    className="cursor-pointer text-red-500 hover:text-red-600 transition-colors"
+                    icon={faTrashCan}
+                    onClick={() => deleteCategory(cat._id)}
+                    title="Delete"
+                  />
+                  <FontAwesomeIcon
+                    className="cursor-pointer text-yellow-500 hover:text-yellow-600 transition-colors"
+                    icon={faPenToSquare}
+                    onClick={() => updateCategory(cat._id, prompt('Enter new category name', cat.name))}
+                    title="Edit"
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
           </div>
           <h2 className="text-2xl font-bold mt-8">All Blogs</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 col-span-4">
@@ -285,9 +288,10 @@ const AdminPage = () => {
                         {blog.title}
                       </h2>
                       <p className="text-xs text-gray-600 mt-1">
-                        <strong>Category:</strong> {blog.category && blog.category.length > 0
+                        <strong>Category:</strong> {blog.category.name}
+                        {/* {blog.category.length > 0
                           ? blog.category.map((cat) => cat.name).join(', ')
-                          : 'Uncategorized'}
+                          : 'Uncategorized'} */}
                       </p>
                     </header>
 
@@ -308,6 +312,17 @@ const AdminPage = () => {
                   </div>
                 </div>
               </article>
+            ))}
+          </div>
+          <div className="flex justify-center mt-6">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentPage(index + 1)}
+                className={`mx-1 px-3 py-1 rounded ${index + 1 === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}
+              >
+                {index + 1}
+              </button>
             ))}
           </div>
 
