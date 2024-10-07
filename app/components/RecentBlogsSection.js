@@ -45,7 +45,7 @@ const RecentBlogsSection = ({ blogs }) => {
                                         </p>
                                         <p className="text-xs text-gray-500">
                                             <strong>Category:</strong> {blog.category.name ||
-                                            blog.category && blog.category.length > 0
+                                        blog.category }{blog.category.length > 0
                                                 ? blog.category.map(cat => cat.name).join(', ')
                                                 : 'Uncategorized'}
                                         </p>
