@@ -36,7 +36,10 @@ const Navbar = () => {
         <Link className="text-3xl font-bold leading-none" href="/">
          <Image src="/logo.svg" width={200} height={50}/>
         </Link>
-        <ul className="hidden absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 lg:flex lg:mx-auto lg:flex lg:items-center lg:w-auto lg:space-x-6">
+        {/* <h1 className='text-xl text-blue-500 hidden px-4 text-center font-bold sm:flex'>
+        YOUR PULSE ON NEWS TRENDS AND THOUGHTFUL INSIGHTS
+        </h1> */}
+        {/* <ul className="hidden absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 lg:flex lg:mx-auto lg:flex lg:items-center lg:w-auto lg:space-x-6">
           <li><Link className="text-sm text-gray-400 hover:text-gray-500" href="/">Home</Link></li>
           <li className="text-gray-300">
             <FontAwesomeIcon icon={faEllipsisVertical} />
@@ -54,7 +57,7 @@ const Navbar = () => {
             <FontAwesomeIcon icon={faEllipsisVertical} />
           </li>
           <li><Link className="text-sm text-gray-400 hover:text-gray-500" href="/About">About</Link></li>
-        </ul>
+        </ul> */}
         <div className="flex">
           <SignedIn>
             <UserButton />

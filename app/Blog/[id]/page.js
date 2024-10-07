@@ -9,6 +9,7 @@ import AdsSection from '../../components/AdsComponents';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import RecentBlogsSection from '../../components/RecentBlogsSection';
 import { DataContext } from '../../context/DataContext';
+import Pagination from '../../components/Pagination';
 
 const BlogDetailPage = ({ params }) => {
   const { id } = params;
@@ -16,7 +17,7 @@ const BlogDetailPage = ({ params }) => {
   const { user, isSignedIn } = useUser();
   const [content, setContent] = useState('');
   const [comments, setComments] = useState([]); // Keep track of comments
-  const {blogs} = useContext(DataContext);
+  const { blogs, currentPage, totalPages, setCurrentPage } = useContext(DataContext);
 
   // Fetch blog data
   useEffect(() => {
@@ -107,7 +108,16 @@ const BlogDetailPage = ({ params }) => {
         )}
       </div>
       <div className="w-full lg:w-1/3 mt-10 lg:mt-0">
-        <RecentBlogsSection blogs={blogs} />
+        <div>
+          <RecentBlogsSection blogs={blogs} />
+        </div>
+        <div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
       </div>
       <AdsSection />
     </div>

@@ -1,11 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import Pagination from './Pagination';
 import { DataContext } from '../context/DataContext';
 const RecentBlogsSection = ({ blogs }) => {
     const [recentBlogs, setRecentBlogs] = useState([]);
-    const {currentPage,
+    const { currentPage,
         totalPages,
         setCurrentPage,
     } = useContext(DataContext);
@@ -64,11 +63,7 @@ const RecentBlogsSection = ({ blogs }) => {
                     <p>No blogs available.</p>
                 )}
             </div>
-            <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+            
         </div>
     );
 };

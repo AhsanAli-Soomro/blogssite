@@ -7,14 +7,10 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
   const [openNewsDropdown, setOpenNewsDropdown] = useState(false);
   const [prevScrollPos, setPrevScrollPos] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
-
-
-
-  // Filter out "PUBG" and "Counter Strike" from the main list so they are shown only in the dropdowns
+  // Filted Categories
   const excludedCategories = ["PUBG", "Counter Strike", "Circket", "World News", "National News",
     "Local News", "Politics", "Business and Finance", "Weather", "Fortnite", "Minecraft", "GTA V",
     "League of Legends"];
-
   // Find specific categories
   const pubg = categories.find(category => category.name === excludedCategories[0]);
   const conterStrike = categories.find(category => category.name === excludedCategories[1]);
@@ -34,7 +30,6 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
   const filteredCategories = categories.filter(
     category => !excludedCategories.includes(category.name) // Use array to filter
   );
-
   // Scroll detection logic to hide/show component
   useEffect(() => {
     const handleScroll = () => {
@@ -88,11 +83,11 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
 
           {/* Show Sports under Games as a dropdown on hover */}
           {openGamesDropdown && category.name === "Games" && (
-            <div className="absolute bg-white shadow-lg p-1 rounded-lg z-10 w-48">
+            <div className="absolute  bg-white shadow-lg p-1 rounded-lg z-10 w-48">
               {pubg && (
                 <button
                   onClick={() => onCategoryChange(pubg._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {pubg.name}
                 </button>
@@ -100,7 +95,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {conterStrike && (
                 <button
                   onClick={() => onCategoryChange(conterStrike._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {conterStrike.name}
                 </button>
@@ -108,7 +103,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {fortnite && (
                 <button
                   onClick={() => onCategoryChange(fortnite._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {fortnite.name}
                 </button>
@@ -116,7 +111,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {minecraft && (
                 <button
                   onClick={() => onCategoryChange(minecraft._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {minecraft.name}
                 </button>
@@ -124,7 +119,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {gtaV && (
                 <button
                   onClick={() => onCategoryChange(gtaV._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {gtaV.name}
                 </button>
@@ -132,7 +127,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {leagueOfLegends && (
                 <button
                   onClick={() => onCategoryChange(leagueOfLegends._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {leagueOfLegends.name}
                 </button>
@@ -144,7 +139,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {circket && (
                 <button
                   onClick={() => onCategoryChange(circket._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {circket.name}
                 </button>
@@ -152,7 +147,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {worldNews && (
                 <button
                   onClick={() => onCategoryChange(worldNews._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {worldNews.name}
                 </button>
@@ -160,7 +155,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {nationalNews && (
                 <button
                   onClick={() => onCategoryChange(nationalNews._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {nationalNews.name}
                 </button>
@@ -168,7 +163,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {localNews && (
                 <button
                   onClick={() => onCategoryChange(localNews._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {localNews.name}
                 </button>
@@ -176,7 +171,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {politics && (
                 <button
                   onClick={() => onCategoryChange(politics._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {politics.name}
                 </button>
@@ -184,7 +179,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {businessAndFinance && (
                 <button
                   onClick={() => onCategoryChange(businessAndFinance._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {businessAndFinance.name}
                 </button>
@@ -192,7 +187,7 @@ const CategoriesFilter = ({ categories = [], selectedCategory, onCategoryChange 
               {weather && (
                 <button
                   onClick={() => onCategoryChange(weather._id)}
-                  className="text-sm py-1 hover:bg-slate-100 w-full text-gray-600 hover:text-blue-500 block"
+                  className="text-sm py-1 hover:bg-slate-100 pl-2 text-start w-full text-gray-600 hover:text-blue-500 block"
                 >
                   {weather.name}
                 </button>

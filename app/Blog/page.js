@@ -1,5 +1,6 @@
 // app/blog/page.js
 "use client";
+
 import { useContext } from "react";
 import Link from 'next/link';
 import AdsSection from '../components/AdsComponents';
