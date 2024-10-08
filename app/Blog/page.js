@@ -94,7 +94,7 @@ const BlogPage = () => {
       </div>
 
       {/* Ads Section */}
-      <AdsSection />
+      {/* <AdsSection /> */}
     </div>
   );
 };

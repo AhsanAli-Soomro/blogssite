@@ -119,7 +119,7 @@ const BlogDetailPage = ({ params }) => {
           />
         </div>
       </div>
-      <AdsSection />
+      {/* <AdsSection /> */}
     </div>
   );
 };
